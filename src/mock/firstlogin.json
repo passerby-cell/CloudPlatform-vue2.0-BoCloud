@@ -1,0 +1,28 @@
+{
+    "state": "success",
+    "code": 200,
+    "data": {
+    "name": "boc管理员",
+    "login": "boc",
+    "email": "",
+    "phone": "",
+    "company": "",
+    "source": 0,
+    "sourceId": "",
+    "ldapOrgDn": "",
+    "firstLogin": 1,
+    "loginStatus": 0,
+    "state": 0,
+    "accountType": 1,
+    "id": 1,
+    "isDeleted": 0,
+    "createTime": "2020-07-14T09:45:32.000+0800",
+    "creator": 0,
+    "updateTime": "2022-07-14T03:29:35.000+0800",
+    "mender": 0,
+    "sourceConfigId": 0,
+    "code": "65c51eab2d5d4794a22c5309b5b0a3a6",
+    "sessionId": "b53f25a3f0da4ed8b69a6bb4530db205",
+    "ssoFlag": 0
+    }
+    }
