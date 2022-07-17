@@ -342,7 +342,7 @@ export default {
   name: "Data",
   data() {
     return {
-      fileSet: [{ name: "test" }],
+      fileSet: [{ name: "test" },{ name: "tescdacasdsxc伟大时代t2" },{ name: "test3" }],
       page: 8,
 
       //路径
