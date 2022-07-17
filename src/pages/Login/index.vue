@@ -8,7 +8,7 @@
           text-color="#fff"
           active-text-color="#ffd04b"
         >
-          <el-col :span="5">
+          <el-col :span="3.5">
             <div style="text-align: center; height: 60px">
               <img
                 src="@/assets/images/favicon.png"

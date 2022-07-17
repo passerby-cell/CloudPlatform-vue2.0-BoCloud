@@ -149,7 +149,7 @@ export default {
           message: result.message,
           type: "success",
         });
-        this.handleCurrentChange(pagenum);
+        this.handleCurrentChange(this.pagenum);
       }
     },
     //TODO: 标记行颜色,运行成功的未标记
