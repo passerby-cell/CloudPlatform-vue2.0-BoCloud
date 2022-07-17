@@ -46,7 +46,7 @@ export default {
   padding: 0px;
 }
 .el-header{
-  min-width: 1430px;
+  min-width: 1440px;
 }
 
 .el-aside {
@@ -55,7 +55,7 @@ export default {
   min-width: 220px;
 }
 .el-main {
-  min-width: 1210px;
+  min-width: 1220px;
   padding: 0px;
 }
 </style>
