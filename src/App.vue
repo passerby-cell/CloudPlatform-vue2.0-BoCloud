@@ -45,12 +45,17 @@ export default {
   line-height: 60px;
   padding: 0px;
 }
+.el-header{
+  min-width: 1430px;
+}
 
 .el-aside {
   background-color: #d3dce6;
   color: #333;
+  min-width: 220px;
 }
 .el-main {
+  min-width: 1210px;
   padding: 0px;
 }
 </style>

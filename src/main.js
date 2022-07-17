@@ -18,7 +18,6 @@ import 'swiper/css/swiper.css'
 
 import router from '@/router'
 
-
 Vue.use(VueRouter)
 Vue.use(ElementUI);
 Vue.use(VueAxios, axios) // 使用 axios 插件

@@ -25,7 +25,31 @@
               size="mini"
               >新建</el-button
             >
-            <el-row> 我是主体 </el-row>
+          </Transition>
+          <el-divider></el-divider>
+          <Transition
+            appear
+            enter-active-class="animate__animated animate__fadeInLeft"
+            leave-active-class="animate__animated animate__fadeOutRight"
+          >
+            <el-row>
+              <el-table
+                :show-header="false"
+                style="width: 100%"
+                max-height="600px"
+                :row-style="{ height: 0 + 'px' }"
+                :cell-style="{ padding: 0 + 'px' }"
+                :data="fileSet"
+              >
+                <el-table-column prop="name" label="文件名" align="left" show-overflow-tooltip ></el-table-column>
+                <el-table-column label="操作" align="right" show-overflow-tooltip width="60px">
+                  <template slot-scope="scope">
+                    <i class="el-icon-edit-outline"></i>
+                    <i class="el-icon-delete" style="margin-left: 3px"></i>
+                  </template>
+                </el-table-column>
+              </el-table>
+            </el-row>
           </Transition>
         </el-card>
       </el-col>
@@ -318,6 +342,7 @@ export default {
   name: "Data",
   data() {
     return {
+      fileSet: [{ name: "test" }],
       page: 8,
 
       //路径
@@ -606,5 +631,10 @@ export default {
   padding-left: 5px;
   padding-top: 8px;
   padding-bottom: 8px;
+}
+.el-divider {
+  background-color: #bcbfc8;
+  height: 2px;
+  margin: 4px 0;
 }
 </style>

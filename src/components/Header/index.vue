@@ -6,13 +6,13 @@
       text-color="#fff"
       active-text-color="#ffd04b"
     >
-      <el-col :span="5">
+      <el-col :span="3.5">
         <div style="text-align:center;height:60px">
           <img src="@/assets/images/favicon.png" style="height: 40px;width: 40px;margin-top:10px" />
           <span class="font">AI/大数据应用支撑平台</span>
         </div>
       </el-col>
-      <el-col :span="2" :offset="15">
+      <el-col :span="2" :offset="17">
         <el-submenu index="1">
           <el-menu-item index="1-1">
             <i class="el-icon-edit"></i>修改密码
@@ -22,7 +22,7 @@
           </template>
         </el-submenu>
       </el-col>
-      <el-col :span="2" style="text-align:center;">
+      <el-col :span="1" style="text-align:center;">
         <el-menu-item index="2" @click="logout">Logout</el-menu-item>
       </el-col>
     </el-menu>
