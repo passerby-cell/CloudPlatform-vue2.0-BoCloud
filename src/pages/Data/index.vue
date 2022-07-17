@@ -41,8 +41,17 @@
                 :cell-style="{ padding: 0 + 'px' }"
                 :data="fileSet"
               >
-                <el-table-column prop="name" label="文件名" align="left" show-overflow-tooltip ></el-table-column>
-                <el-table-column label="操作" align="right" show-overflow-tooltip width="60px">
+                <el-table-column
+                  prop="name"
+                  label="文件名"
+                  align="left"
+                  show-overflow-tooltip
+                ></el-table-column>
+                <el-table-column
+                  label="操作"
+                  align="right"
+                  width="60px"
+                >
                   <template slot-scope="scope">
                     <i class="el-icon-edit-outline"></i>
                     <i class="el-icon-delete" style="margin-left: 3px"></i>
@@ -222,7 +231,7 @@
             <el-checkbox @change="selectFile(scope.row)"></el-checkbox>
           </template>-->
                 </el-table-column>
-                <el-table-column prop="name" label="文件名">
+                <el-table-column prop="name" label="文件名" show-overflow-tooltip>
                   <template slot-scope="scope">
                     <el-row>
                       <el-col :span="1">
@@ -255,12 +264,13 @@
                   </template>
                 </el-table-column>
                 <el-table-column
+                show-overflow-tooltip
                   prop="uploaddate"
                   label="上传日期"
                   width="300"
                 ></el-table-column>
-                <el-table-column prop="size" label="大小(MB)"></el-table-column>
-                <el-table-column label="操作" width="400">
+                <el-table-column prop="size" label="大小(MB)" show-overflow-tooltip></el-table-column>
+                <el-table-column label="操作" width="400" show-overflow-tooltip>
                   <template slot-scope="scope">
                     <el-button
                       style="margin-left: 10px"
@@ -314,16 +324,23 @@
             </Transition>
           </el-row>
           <el-col style="text-align: center">
-            <el-pagination
-              :background="true"
-              :page-sizes="[1, 2, 3, 4, 5, 6, 7, 8]"
-              :page-size="page"
-              layout="prev, pager, next,sizes"
-              :page-count="Number(totalpage)"
-              @current-change="handleCurrentChange"
-              @size-change="handleSizeChange"
-            ></el-pagination> </el-col
-        ></el-card>
+            <Transition
+              appear
+              enter-active-class="animate__animated animate__fadeInLeft"
+              leave-active-class="animate__animated animate__fadeOutRight"
+            >
+              <el-pagination
+                :background="true"
+                :page-sizes="[10,20,30]"
+                :page-size="page"
+                layout="prev, pager, next,sizes"
+                :page-count="Number(totalpage)"
+                @current-change="handleCurrentChange"
+                @size-change="handleSizeChange"
+              ></el-pagination>
+            </Transition>
+          </el-col>
+        </el-card>
       </el-col>
     </el-row>
   </div>
@@ -342,7 +359,11 @@ export default {
   name: "Data",
   data() {
     return {
-      fileSet: [{ name: "test" },{ name: "tescdacasdsxc伟大时代t2" },{ name: "test3" }],
+      fileSet: [
+        { name: "test" },
+        { name: "tescdacasdsxc伟大时代t2" },
+        { name: "test3" },
+      ],
       page: 8,
 
       //路径

@@ -16,11 +16,12 @@
       leave-active-class="animate__animated animate__fadeOutRight"
     >
       <el-table
+      :row-style="{ height: 40 + 'px' }"
+        :cell-style="{ padding: 0 + 'px' }"
         style="width: 100%; margin-top: 10px; margin-left: 10px"
         :data="formatedJobList"
         :border="true"
         :row-class-name="tableRowClassName"
-        :row-style="{ height: '20px' }"
         max-height="580"
       >
         <el-table-column prop="vcJobCnName" label="任务名"></el-table-column>
@@ -30,28 +31,32 @@
           prop="taskTotal"
           label="总任务数"
           width="100"
+          show-overflow-tooltip
         ></el-table-column>
         <el-table-column
           prop="taskCompleted"
           label="运行完成数"
           width="100"
+          show-overflow-tooltip
         ></el-table-column>
         <el-table-column
           prop="taskPending"
           label="排队中"
           width="80"
+          show-overflow-tooltip
         ></el-table-column>
         <el-table-column
           prop="cpuUsed"
           label="cpu使用量"
           width="100"
+          show-overflow-tooltip
         ></el-table-column>
         <el-table-column
           prop="memUsed"
           label="内存使用量"
           width="100"
         ></el-table-column>
-        <el-table-column prop="status" label="状态" width="80">
+        <el-table-column prop="status" label="状态" width="80" align="center">
           <template slot-scope="scope">
             <el-tag
               v-if="scope.row.status == 'Terminated'"
@@ -75,7 +80,7 @@
           </template>
         </el-table-column>
         <!-- TODO: 对任务的操作 -->
-        <el-table-column label="操作" width="160">
+        <el-table-column label="操作" width="160" align="center">
           <template slot-scope="scope">
             <el-button
               size="mini"
@@ -95,7 +100,7 @@
       >
         <el-pagination
           :background="true"
-          :page-sizes="[1, 2, 3, 4, 5, 6, 7, 8]"
+          :page-sizes="[10,20,30]"
           :page-size="page"
           layout="prev, pager, next,sizes"
           :page-count="Number(totalpage)"
