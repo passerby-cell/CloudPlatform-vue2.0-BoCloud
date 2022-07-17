@@ -17,3 +17,4 @@
 `npm install iview`
 ## install base64 
 `npm install js-base64`# CloudPlatform-vue2.0-BoCloud
+# CloudPlatform-vue2.0-BoCloud
