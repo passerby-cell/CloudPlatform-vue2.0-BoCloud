@@ -23,9 +23,30 @@
               type="primary"
               icon="el-icon-circle-plus-outline"
               size="mini"
+              @click="parentFileDialogVisible = true"
               >新建</el-button
             >
           </Transition>
+          <el-dialog
+            title="新建数据集"
+            :visible.sync="parentFileDialogVisible"
+            width="30%"
+            :before-close="handleClose"
+          >
+            <el-input
+              placeholder="请输入新建的数据集名称"
+              size="small"
+              v-model="newParentFileName"
+            ></el-input>
+            <span slot="footer" class="dialog-footer">
+              <el-button @click="parentFileDialogVisible = false" size="small"
+                >取 消</el-button
+              >
+              <el-button type="primary" @click="createParentFile" size="small"
+                >确 定</el-button
+              >
+            </span>
+          </el-dialog>
           <el-divider></el-divider>
           <Transition
             appear
@@ -34,6 +55,7 @@
           >
             <el-row>
               <el-table
+                highlight-current-row
                 :show-header="false"
                 style="width: 100%"
                 max-height="600px"
@@ -46,11 +68,23 @@
                   label="文件名"
                   align="left"
                   show-overflow-tooltip
-                ></el-table-column>
+                >
+                  <template slot-scope="scope">
+                    <span
+                      @click="updateFileList(scope.row.id, pageNum, null)"
+                      class="parentIcon"
+                      >{{ scope.row.name }}</span
+                    >
+                  </template>
+                </el-table-column>
                 <el-table-column label="操作" align="right" width="60px">
                   <template slot-scope="scope">
-                    <i class="el-icon-edit-outline"></i>
-                    <i class="el-icon-delete" style="margin-left: 3px"></i>
+                    <i class="el-icon-edit-outline parentIcon"></i>
+                    <i
+                      class="el-icon-delete parentIcon"
+                      style="margin-left: 10px"
+                      @click="deleteParentFile(scope.row.id)"
+                    ></i>
                   </template>
                 </el-table-column>
               </el-table>
@@ -245,19 +279,18 @@
                         ></i>
                       </el-col>
                       <el-col :span="22" :offset="1">
-
                         <el-input
                           v-focus
                           size="mini"
                           v-model="scope.row.name"
                           v-if="isShow[scope.$index]"
                           :placeholder="scope.row.fileName"
-                          @blur="updatename(scope.$index,scope.row)"
+                          @blur="updatename(scope.$index, scope.row)"
                           @focus="oldname = scope.row.fileName"
-                          style="margin-left: 5px;"
-                        ></el-input> 
-                      <span
-                      style="margin-left: 5px;"
+                          style="margin-left: 5px"
+                        ></el-input>
+                        <span
+                          style="margin-left: 5px"
                           v-show="!isShow[scope.$index]"
                           @click="changeIsShow(scope.$index)"
                           >{{ scope.row.fileName }}</span
@@ -355,13 +388,13 @@
 
 <script>
 import { mapState } from "vuex";
-import { reqParentFile } from "@/api";
+import { reqParentFile, reqCreateParentFile, reqDeleteParentFile } from "@/api";
 export default {
   name: "Data",
   data() {
     return {
       page: 10,
-isShow:[],
+      isShow: [],
       //路径
       path: [],
       idpath: [],
@@ -373,10 +406,12 @@ isShow:[],
       fileDialogVisible: false,
       // 上传文件对话框
       uploadDialogVisible: false,
+      parentFileDialogVisible: false,
       // 新建文件夹的名称
       newDirName: "",
       // 旧文件的名称
       oldname: "",
+      newParentFileName: "",
     };
   },
   directives: {
@@ -423,14 +458,44 @@ isShow:[],
     },
   },
   methods: {
-    changeIsShow(index){
-      let flag=!this.isShow[index]
-      this.isShow.splice(index,1,flag)
+    async deleteParentFile(id) {
+      alert("是否确认删除?");
+      let result = await reqDeleteParentFile(id);
+      if (result.code == "200") {
+        this.$message({
+          type: "success",
+          message: "删除成功",
+        });
+        this.updateParentFileList();
+      } else {
+        this.$message.error("删除失败");
+      }
     },
-    initShow(){
-for(let i=0;i<this.childFileList.length;i++){
-  this.isShow.push(false)
-}
+    async createParentFile() {
+      //TODO:storageId type
+      let result = await reqCreateParentFile(this.newParentFileName, "", 6, 1);
+      if (result.code == "200") {
+        this.parentFileDialogVisible = false;
+        this.$message({
+          type: "success",
+          message: "新建成功",
+        });
+        this.updateParentFileList();
+        this.newParentFileName=''
+      } else {
+        this.$message.error("新建失败");
+      }
+    },
+    changeIsShow(index) {
+      let flag = !this.isShow[index];
+      this.isShow.splice(index, 1, flag);
+    },
+    initShow() {
+      if (this.childFileList != null) {
+        for (let i = 0; i < this.childFileList.length; i++) {
+          this.isShow.push(false);
+        }
+      }
     },
     previewFile(name) {
       let url = "http://127.0.0.1:8080/preview" + this.dirpath + "/" + name;
@@ -598,17 +663,29 @@ for(let i=0;i<this.childFileList.length;i++){
       this.idpath.push(row.id);
       this.updateFileList(1, row.id);
     },
-    updateFileList(val, filePath) {
+    updateFileList(parentId, val, filePath) {
+      if (parentId == null && this.parentFileList.length > 0) {
+        parentId = this.parentFileList[0].id;
+      }
       this.$store.dispatch("File/getChildFileList", {
         dataId: parentId,
         filePath: filePath,
         current: val,
         size: this.page,
       });
-      this.initShow()
+      this.initShow();
+    },
+    async updateParentFileList() {
+      let result = await reqParentFile(1, 0, 0);
+      if (result.code == "200") {
+        this.$store.dispatch("File/getParentFileList", result.data);
+      }
+      if(this.parentFileList!=null) {
+        this.updateFileList(this.parentFileList[0].id,this.pageNum,null)
+      }
     },
     async updatename(index, row) {
-     this.changeIsShow(index)
+      this.changeIsShow(index);
       let dirpath = "";
       this.path.forEach((item) => {
         dirpath = dirpath + "/" + item;
@@ -641,9 +718,9 @@ for(let i=0;i<this.childFileList.length;i++){
     },
   },
   async mounted() {
-    let result = await reqParentFile(1,0,0);
+    let result = await reqParentFile(1, 0, 0);
     this.$store.dispatch("File/getParentFileList", result.data);
-    if (result.code == "200"&&result.data.length > 0) {
+    if (result.code == "200" && result.data.length > 0) {
       this.$store.dispatch("File/getChildFileList", {
         dataId: result.data[0].id,
         filePath: null,
@@ -651,7 +728,7 @@ for(let i=0;i<this.childFileList.length;i++){
         size: this.page,
       });
     }
-    this.initShow()
+    this.initShow();
   },
 };
 </script>
@@ -676,5 +753,8 @@ for(let i=0;i<this.childFileList.length;i++){
   background-color: #bcbfc8;
   height: 2px;
   margin: 4px 0;
+}
+.parentIcon {
+  cursor: pointer;
 }
 </style>

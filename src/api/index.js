@@ -58,3 +58,21 @@ export const reqChildFileList = (dataId, filePath, current, size) =>
       size,
     },
   });
+
+export const reqCreateParentFile = (name, remark, storageId, type) =>
+  apirequest({
+    url: "/paas-web/bocapi/dataBcc/add",
+    method: "post",
+    data: {
+      name,
+      remark,
+      storageId,
+      type,
+    },
+  });
+
+export const reqDeleteParentFile = (id) =>
+  apirequest({
+    url: `/paas-web/bocapi/dataBcc/${id}`,
+    method: "delete",
+  });
