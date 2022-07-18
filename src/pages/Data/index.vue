@@ -55,7 +55,7 @@
           >
             <el-row>
               <el-table
-                highlight-current-row
+              highlight-current-row
                 :show-header="false"
                 style="width: 100%"
                 max-height="600px"
@@ -79,15 +79,43 @@
                 </el-table-column>
                 <el-table-column label="操作" align="right" width="60px">
                   <template slot-scope="scope">
-                    <i class="el-icon-edit-outline parentIcon"></i>
+                    <i
+                      class="el-icon-edit-outline parentIcon"
+                      @click="updateParentFileNameDialogVisible(scope.row)"
+                    ></i>
+
                     <i
                       class="el-icon-delete parentIcon"
                       style="margin-left: 10px"
                       @click="deleteParentFile(scope.row.id)"
                     ></i>
                   </template>
-                </el-table-column>
-              </el-table>
+                </el-table-column> </el-table
+              ><el-dialog
+                title="重命名数据集"
+                :visible.sync="parentFileNameDialogVisible"
+                width="30%"
+                :before-close="handleClose"
+              >
+                <el-input
+                  placeholder="请输入重命名的数据集名称"
+                  size="small"
+                  v-model="newParentFileName"
+                ></el-input>
+                <span slot="footer" class="dialog-footer">
+                  <el-button
+                    @click="parentFileNameDialogVisible = false"
+                    size="small"
+                    >取 消</el-button
+                  >
+                  <el-button
+                    type="primary"
+                    @click="updateParentFileName()"
+                    size="small"
+                    >确 定</el-button
+                  >
+                </span>
+              </el-dialog>
             </el-row>
           </Transition>
         </el-card>
@@ -271,11 +299,11 @@
                       <el-col :span="1">
                         <i
                           class="el-icon-folder"
-                          v-if="!(scope.row.fileType == 1)"
+                          v-if="(scope.row.fileType == 1)"
                         ></i>
                         <i
                           class="el-icon-document"
-                          v-if="scope.row.fileType == 1"
+                          v-if="!(scope.row.fileType == 1)"
                         ></i>
                       </el-col>
                       <el-col :span="22" :offset="1">
@@ -388,7 +416,12 @@
 
 <script>
 import { mapState } from "vuex";
-import { reqParentFile, reqCreateParentFile, reqDeleteParentFile } from "@/api";
+import {
+  reqParentFile,
+  reqCreateParentFile,
+  reqDeleteParentFile,
+  reqUpdateParentFileName,
+} from "@/api";
 export default {
   name: "Data",
   data() {
@@ -407,11 +440,13 @@ export default {
       // 上传文件对话框
       uploadDialogVisible: false,
       parentFileDialogVisible: false,
+      parentFileNameDialogVisible: false,
       // 新建文件夹的名称
       newDirName: "",
       // 旧文件的名称
       oldname: "",
       newParentFileName: "",
+      newParentFileId: "",
     };
   },
   directives: {
@@ -458,6 +493,31 @@ export default {
     },
   },
   methods: {
+    updateParentFileNameDialogVisible(row) {
+      this.parentFileNameDialogVisible = true;
+      this.newParentFileName = row.name;
+      this.newParentFileId = row.id;
+    },
+    async updateParentFileName() {
+      let result = await reqUpdateParentFileName(
+        this.newParentFileId,
+        this.newParentFileName,
+        "",
+        6,
+        1
+      );
+      if (result.code == "200") {
+        this.$message({
+          type: "success",
+          message: "更新成功",
+        });
+        this.parentFileNameDialogVisible = false;
+        this.updateParentFileList();
+        this.newParentFileName = "";
+      } else {
+        this.$message.error("更新失败");
+      }
+    },
     async deleteParentFile(id) {
       alert("是否确认删除?");
       let result = await reqDeleteParentFile(id);
@@ -481,7 +541,7 @@ export default {
           message: "新建成功",
         });
         this.updateParentFileList();
-        this.newParentFileName=''
+        this.newParentFileName = "";
       } else {
         this.$message.error("新建失败");
       }
@@ -680,8 +740,8 @@ export default {
       if (result.code == "200") {
         this.$store.dispatch("File/getParentFileList", result.data);
       }
-      if(this.parentFileList!=null) {
-        this.updateFileList(this.parentFileList[0].id,this.pageNum,null)
+      if (this.parentFileList != null) {
+        this.updateFileList(this.parentFileList[0].id, this.pageNum, null);
       }
     },
     async updatename(index, row) {
