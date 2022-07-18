@@ -228,7 +228,7 @@
                 >
               </span>
             </el-dialog>
-            <Transition
+            <!-- <Transition
               appear
               enter-active-class="animate__animated animate__fadeInLeft"
               leave-active-class="animate__animated animate__fadeOutRight"
@@ -253,7 +253,7 @@
                   >下载文件</el-button
                 >
               </a></Transition
-            >
+            > -->
             <!-- @click="downloadFiles" -->
             <Transition
               appear
@@ -345,7 +345,7 @@
                       type="primary"
                       icon="el-icon-view"
                       size="small"
-                      v-if="scope.row.isfile == 1"
+                      v-if="scope.row.fileType != 1"
                       @click="previewFile(scope.row.name)"
                       >预览</el-button
                     >
@@ -359,14 +359,14 @@
                         dirpath
                       "
                     >
-                      <el-button
+                      <!-- <el-button
                         style="margin-left: 10px"
                         type="warning"
                         icon="el-icon-download"
                         size="small"
-                        v-if="scope.row.isfile == 1"
+                        v-if="scope.row.fileType != 1"
                         >下载</el-button
-                      >
+                      > -->
                     </a>
                     <!-- @click="downloadFile(scope.row.name)" -->
                     <el-button
@@ -374,7 +374,7 @@
                       type="success"
                       icon="el-icon-folder-opened"
                       size="small"
-                      v-if="!(scope.row.isfile == 1)"
+                      v-if="(scope.row.fileType == 1)"
                       @click="openDir(scope.row)"
                       >打开</el-button
                     >
