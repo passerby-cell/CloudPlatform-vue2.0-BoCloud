@@ -1,50 +1,59 @@
 //示例:user组件的仓库
 import {
-  reqFileList,
+  reqChildFileList
   //从api模块中引入请求  
 } from '@/api'
 //准备actions,用于响应组件中的动作
 const actions = {
   //通过api里面的接口函数发送请求,获取服务器的数据
-  async getFileList({
+  getParentFileList({
     commit
-  }, {
-    token,
-    userid,
-    parentdirid,
-    pagenum,
-    pagesize
-  }) {
-    let result = await reqFileList(token, userid, parentdirid, pagenum, pagesize)
-    if (result.code === 200) {
-      commit('FILELIST', result.data.rows)
-      commit('PAGENUM', result.data.pagenum)
-      commit('PAGESIZE', result.data.pagesize)
-      commit('TOTALPAGE', result.data.totalpage)
+  }, data) {
+      commit('PARENTFILELIST',data)
+
+  },
+  async getChildFileList({
+    commit
+  }, data) {
+    let result = await reqChildFileList(data.dataId,data.filePath,data.current,data.size)
+    if (result.code == 200) {
+      commit('PAGENUM', result.data.current)
+      commit('FILEPATH', result.data.filePath)
+      commit('CHILDFILELIST', result.data.fileList)
+      commit('PAGESIZE', result.data.size)
+      commit('TOATLRECORD', result.data.total)
     }
   },
 }
 //准备mutations,用于操作数据--state
 const mutations = {
-  FILELIST(state, filelist) {
-    state.filelist = filelist
+  PARENTFILELIST(state, parentFileList) {
+    state.parentFileList = parentFileList
   },
-  PAGENUM(state, pagenum) {
-    state.pagenum = pagenum
+  PAGENUM(state, pageNum) {
+    state.pageNum = pageNum
   },
-  PAGESIZE(state, pagesize) {
-    state.pagesize = pagesize
+  FILEPATH(state, filePath) {
+    state.filePath = filePath
   },
-  TOTALPAGE(state, totalpage) {
-    state.totalpage = totalpage
+  CHILDFILELIST(state, childFileList) {
+    state.childFileList = childFileList
+  },
+  PAGESIZE(state, pageSize) {
+    state.pageSize = pageSize
+  },
+  TOATLRECORD(state, totalRecord) {
+    state.totalRecord = totalRecord
   },
 }
 //准备state,用于存储数据,要先准备仓库categoryList,才能存储数据
 const state = {
-  filelist: [],
-  pagesize: '',
-  pagenum: '',
-  totalpage: '',
+  parentFileList: [],
+  childFileList: [],
+  pageNum:'',
+  filePath:'',
+  pageSize:'',
+  totalRecord:'',
 }
 
 //用于简化数据

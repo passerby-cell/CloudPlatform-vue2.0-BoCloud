@@ -39,7 +39,7 @@
                 max-height="600px"
                 :row-style="{ height: 0 + 'px' }"
                 :cell-style="{ padding: 0 + 'px' }"
-                :data="fileSet"
+                :data="parentFileList"
               >
                 <el-table-column
                   prop="name"
@@ -47,11 +47,7 @@
                   align="left"
                   show-overflow-tooltip
                 ></el-table-column>
-                <el-table-column
-                  label="操作"
-                  align="right"
-                  width="60px"
-                >
+                <el-table-column label="操作" align="right" width="60px">
                   <template slot-scope="scope">
                     <i class="el-icon-edit-outline"></i>
                     <i class="el-icon-delete" style="margin-left: 3px"></i>
@@ -220,7 +216,7 @@
             >
               <el-table
                 ref="table"
-                :data="filelist"
+                :data="childFileList"
                 style="width: 100%; margin-left: 10px"
                 max-height="600px"
                 @select-all="selectTableAll"
@@ -231,45 +227,56 @@
             <el-checkbox @change="selectFile(scope.row)"></el-checkbox>
           </template>-->
                 </el-table-column>
-                <el-table-column prop="name" label="文件名" show-overflow-tooltip>
+                <el-table-column
+                  prop="fileName"
+                  label="文件名"
+                  show-overflow-tooltip
+                >
                   <template slot-scope="scope">
                     <el-row>
                       <el-col :span="1">
                         <i
                           class="el-icon-folder"
-                          v-if="!(scope.row.isfile == 1)"
+                          v-if="!(scope.row.fileType == 1)"
                         ></i>
                         <i
                           class="el-icon-document"
-                          v-if="scope.row.isfile == 1"
+                          v-if="scope.row.fileType == 1"
                         ></i>
                       </el-col>
                       <el-col :span="22" :offset="1">
+
                         <el-input
                           v-focus
-                          size="small"
+                          size="mini"
                           v-model="scope.row.name"
-                          v-if="!Boolean(scope.row.isshow)"
-                          placeholder="scope.row.name"
-                          @blur="updatename(scope.row)"
-                          @focus="oldname = scope.row.name"
-                        ></el-input>
-                        <span
-                          v-show="Boolean(scope.row.isshow)"
-                          @click="scope.row.isshow = !Boolean(scope.row.isshow)"
-                          >{{ scope.row.name }}</span
+                          v-if="isShow[scope.$index]"
+                          :placeholder="scope.row.fileName"
+                          @blur="updatename(scope.$index,scope.row)"
+                          @focus="oldname = scope.row.fileName"
+                          style="margin-left: 5px;"
+                        ></el-input> 
+                      <span
+                      style="margin-left: 5px;"
+                          v-show="!isShow[scope.$index]"
+                          @click="changeIsShow(scope.$index)"
+                          >{{ scope.row.fileName }}</span
                         >
                       </el-col>
                     </el-row>
                   </template>
                 </el-table-column>
                 <el-table-column
-                show-overflow-tooltip
-                  prop="uploaddate"
-                  label="上传日期"
+                  show-overflow-tooltip
+                  prop="modifyTime"
+                  label="修改时间"
                   width="300"
                 ></el-table-column>
-                <el-table-column prop="size" label="大小(MB)" show-overflow-tooltip></el-table-column>
+                <el-table-column
+                  prop="fileSize"
+                  label="大小"
+                  show-overflow-tooltip
+                ></el-table-column>
                 <el-table-column label="操作" width="400" show-overflow-tooltip>
                   <template slot-scope="scope">
                     <el-button
@@ -331,10 +338,10 @@
             >
               <el-pagination
                 :background="true"
-                :page-sizes="[10,20,30]"
+                :page-sizes="[10, 20, 30]"
                 :page-size="page"
                 layout="prev, pager, next,sizes"
-                :page-count="Number(totalpage)"
+                :total="Number(totalRecord)"
                 @current-change="handleCurrentChange"
                 @size-change="handleSizeChange"
               ></el-pagination>
@@ -348,24 +355,13 @@
 
 <script>
 import { mapState } from "vuex";
-import {
-  reqMKDir,
-  reqUploadFile,
-  reqUpdataFileName,
-  reqDeleteFiles,
-  reqDeleteFile,
-} from "@/api";
+import { reqParentFile } from "@/api";
 export default {
   name: "Data",
   data() {
     return {
-      fileSet: [
-        { name: "test" },
-        { name: "tescdacasdsxc伟大时代t2" },
-        { name: "test3" },
-      ],
-      page: 8,
-
+      page: 10,
+isShow:[],
       //路径
       path: [],
       idpath: [],
@@ -394,7 +390,13 @@ export default {
     },
   },
   computed: {
-    ...mapState("File", ["filelist", "pagesize", "pagenum", "totalpage"]),
+    ...mapState("File", [
+      "parentFileList",
+      "childFileList",
+      "pageNum",
+      "filePath",
+      "totalRecord",
+    ]),
     dirpath() {
       let dirpath = "";
       this.path.forEach((item) => {
@@ -421,6 +423,15 @@ export default {
     },
   },
   methods: {
+    changeIsShow(index){
+      let flag=!this.isShow[index]
+      this.isShow.splice(index,1,flag)
+    },
+    initShow(){
+for(let i=0;i<this.childFileList.length;i++){
+  this.isShow.push(false)
+}
+    },
     previewFile(name) {
       let url = "http://127.0.0.1:8080/preview" + this.dirpath + "/" + name;
       // let url =
@@ -587,17 +598,17 @@ export default {
       this.idpath.push(row.id);
       this.updateFileList(1, row.id);
     },
-    updateFileList(val, dirid) {
-      this.$store.dispatch("File/getFileList", {
-        token: localStorage.getItem("token"),
-        userid: localStorage.getItem("userid"),
-        parentdirid: dirid,
-        pagenum: val,
-        pagesize: this.page,
+    updateFileList(val, filePath) {
+      this.$store.dispatch("File/getChildFileList", {
+        dataId: parentId,
+        filePath: filePath,
+        current: val,
+        size: this.page,
       });
+      this.initShow()
     },
-    async updatename(row) {
-      row.isshow = !Boolean(row.isshow);
+    async updatename(index, row) {
+     this.changeIsShow(index)
       let dirpath = "";
       this.path.forEach((item) => {
         dirpath = dirpath + "/" + item;
@@ -629,10 +640,18 @@ export default {
       this.updateFileList(1, parentdirid);
     },
   },
-  mounted() {
-    this.updateFileList(1, localStorage.getItem("userid"));
-    this.path.push(localStorage.getItem("userid"));
-    this.idpath.push(localStorage.getItem("userid"));
+  async mounted() {
+    let result = await reqParentFile(1,0,0);
+    this.$store.dispatch("File/getParentFileList", result.data);
+    if (result.code == "200"&&result.data.length > 0) {
+      this.$store.dispatch("File/getChildFileList", {
+        dataId: result.data[0].id,
+        filePath: null,
+        current: 1,
+        size: this.page,
+      });
+    }
+    this.initShow()
   },
 };
 </script>
