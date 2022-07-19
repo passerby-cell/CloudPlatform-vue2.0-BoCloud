@@ -295,7 +295,7 @@
                         <el-input
                           v-focus
                           size="mini"
-                          v-model="scope.row.name"
+                          v-model="scope.row.fileName"
                           v-if="isShow[scope.$index]"
                           :placeholder="scope.row.fileName"
                           @blur="updatename(scope.$index, scope.row)"
@@ -334,7 +334,7 @@
                       @click="previewFile(scope.row.name)"
                       >预览</el-button
                     >
-                    <a
+                    <!-- <a
                       :href="
                         'http://localhost:8080/file/downloadfile?token=' +
                         localtoken +
@@ -343,8 +343,8 @@
                         '&dirpath=' +
                         dirpath
                       "
-                    >
-                      <!-- <el-button
+                    > -->
+                    <!-- <el-button
                         style="margin-left: 10px"
                         type="warning"
                         icon="el-icon-download"
@@ -352,7 +352,7 @@
                         v-if="scope.row.fileType != 1"
                         >下载</el-button
                       > -->
-                    </a>
+                    <!-- </a> -->
                     <!-- @click="downloadFile(scope.row.name)" -->
                     <el-button
                       style="margin-left: 10px"
@@ -409,6 +409,7 @@ import {
   reqUpdateChildFileName,
   reqCreateChildFolder,
   reqDeleteChildFile,
+  reqUploadChildFile,
 } from "@/api";
 export default {
   name: "Data",
@@ -461,23 +462,6 @@ export default {
       });
       return dirpath;
     },
-    ids() {
-      let ids = "";
-      for (const element of this.checkedfileid) {
-        ids += "/" + element;
-      }
-      return ids;
-    },
-    localtoken() {
-      return localStorage.getItem("token");
-    },
-    files() {
-      let files = "";
-      for (const element of this.checkedfile) {
-        files += "/" + element;
-      }
-      return files;
-    },
   },
   methods: {
     updateChileFileList(id, pageNum, path, fileName) {
@@ -520,7 +504,7 @@ export default {
         });
         this.updateParentFileList();
       } else {
-        this.$message.error("删除失败");
+        this.$message.error(result.data);
       }
     },
     async createParentFile() {
@@ -597,28 +581,34 @@ export default {
       this.updateFileList(this.parentId, this.pageNum, this.dirpath);
     },
     async uploadFile(files) {
-      let dirpath = "";
-      this.path.forEach((item) => {
-        dirpath = dirpath + "/" + item;
-      });
-      let parentdirid = this.idpath[this.idpath.length - 1];
-
-      const formData = new FormData();
-      formData.append("file", files.file);
-      let result = await reqUploadFile(
-        localStorage.getItem("token"),
-        localStorage.getItem("userid"),
-        dirpath,
-        parentdirid,
-        formData
-      );
-      if (result.code == "200") {
-        this.updateFileList(this.pagenum, parentdirid);
+      if (files.file.size < 2048000) {
+        const formData = new FormData();
+        formData.append("file", files.file);
+        console.log(files.file);
+        let identifier =
+          files.file.size +
+          "-" +
+          files.file.name.substring(0, 2) +
+          files.file.name.split(".")[files.file.name.split(".").length - 1];
+        let result = await reqUploadChildFile(
+          files.file.size,
+          files.file.size,
+          identifier,
+          files.file.name,
+          files.file.name,
+          this.dirpath,
+          this.parentId,
+          files.file
+        );
+        if (result.code == "200") {
+          this.updateFileList(this.parentId, this.pageNum, this.dirpath);
+        } else {
+          this.$message.error("上传失败");
+        }
       } else {
-        this.$message.error("上传失败");
+        this.$message.error("文件过大,无法上传");
       }
     },
-
     submitUpload() {
       this.$refs.upload.submit();
     },
@@ -670,7 +660,8 @@ export default {
             this.checkedfile.push(item.fileName);
           });
         }
-      }this.checkedfile = [];
+      }
+      this.checkedfile = [];
     },
     selectFile(selection, row) {
       if (this.checkedfile.includes(row.fileName)) {
@@ -682,13 +673,13 @@ export default {
       } else {
         this.checkedfile.push(row.fileName);
       }
-      if (this.childFileList!=null) {
-      if (this.checkedfile.length == this.childFileList.length) {
-        this.checkedall = true;
+      if (this.childFileList != null) {
+        if (this.checkedfile.length == this.childFileList.length) {
+          this.checkedall = true;
+        } else {
+          this.checkedall = false;
+        }
       } else {
-        this.checkedall = false;
-      }
-      }else{
         this.checkedall = false;
       }
     },
@@ -724,25 +715,23 @@ export default {
     },
     async updatename(index, row) {
       this.changeIsShow(index);
-      let dirpath = "";
-      this.path.forEach((item) => {
-        dirpath = dirpath + "/" + item;
-      });
-      let result = await reqUpdataFileName(
-        localStorage.getItem("token"),
-        localStorage.getItem("userid"),
-        row.name,
-        this.oldname,
-        row.id,
-        dirpath
-      );
-      if (result.code == "200") {
-        this.$message({
-          type: "success",
-          message: "修改成功",
-        });
+      if (this.oldname != row.fileName) {
+        let result = await reqUpdateChildFileName(
+          this.parentId,
+          this.dirpath,
+          this.oldname,
+          row.fileName
+        );
+        if (result.code == "200") {
+          this.$message({
+            type: "success",
+            message: "修改成功",
+          });
+        } else {
+          this.$message.error("修改失败");
+        }
       } else {
-        this.$message.error(result.message);
+        this.$message.warning("新名称与原名称相同");
       }
     },
     handleCurrentChange(val) {
@@ -757,6 +746,7 @@ export default {
   },
   async mounted() {
     let result = await reqParentFile(1, 0, 0);
+    if (result.data.length>0) {
     this.$store.dispatch("File/getParentFileList", result.data);
     this.parentFileName = result.data[0].name;
     if (result.code == "200" && result.data.length > 0) {
@@ -768,6 +758,7 @@ export default {
       });
     }
     this.initShow();
+    this.parentId = result.data[0].id;}
   },
 };
 </script>

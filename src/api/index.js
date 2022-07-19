@@ -124,3 +124,35 @@ export const reqDeleteChildFile = (dataId, fileList, filePath) =>
       filePath,
     },
   });
+
+export const reqUploadChildFile = (
+  currentChunkSize,
+  totalSize,
+  identifier,
+  filename,
+  relativePath,
+  filePath,
+  dataId,
+  file
+) =>
+  apirequest({
+    url: "/paas-web/bocapi/fileBcc/upload",
+    method: "post",
+    headers:{
+      'Content-Type':'multipart/form-data'
+    },
+    data: {
+      chunkNumber: "1",
+      chunkSize: "2048000",
+      currentChunkSize,
+      totalSize,
+      identifier,
+      filename,
+      relativePath,
+      totalChunks: "1",
+      filePath,
+      rootPath: "/opt/bcc/storage1/NFS3",
+      dataId,
+      file
+    },
+  });
