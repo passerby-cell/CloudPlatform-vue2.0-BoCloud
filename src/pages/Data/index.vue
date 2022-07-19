@@ -584,7 +584,6 @@ export default {
       if (files.file.size < 2048000) {
         const formData = new FormData();
         formData.append("file", files.file);
-        console.log(files.file);
         let identifier =
           files.file.size +
           "-" +
@@ -595,7 +594,7 @@ export default {
           files.file.size,
           identifier,
           files.file.name,
-          files.file.name,
+          files.file.webkitRelativePath,
           this.dirpath,
           this.parentId,
           files.file
@@ -661,7 +660,6 @@ export default {
           });
         }
       }
-      this.checkedfile = [];
     },
     selectFile(selection, row) {
       if (this.checkedfile.includes(row.fileName)) {
