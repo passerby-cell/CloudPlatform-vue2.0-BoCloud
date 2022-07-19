@@ -101,3 +101,12 @@ export const reqUpdateChildFileName = (dataId, filePath, fileName, newName) =>
       newName,
     },
   });
+
+  export const reqCreateChildFolder = (dataId, filePath, folderName, desc) =>
+  apirequest({
+    url: "/paas-web/bocapi/fileBcc/createFolder",
+    method: "get",
+    params: {
+      dataId, filePath, folderName, desc
+    },
+  });

@@ -400,6 +400,7 @@ import {
   reqDeleteParentFile,
   reqUpdateParentFileName,
   reqUpdateChildFileName,
+  reqCreateChildFolder,
 } from "@/api";
 export default {
   name: "Data",
@@ -633,24 +634,13 @@ export default {
       }
     },
     async newDir() {
-      let dirpath = "";
-      this.path.forEach((item) => {
-        dirpath = dirpath + "/" + item;
-      });
-      let parentdirid = this.idpath[this.idpath.length - 1];
-      let result = await reqMKDir(
-        localStorage.getItem("token"),
-        localStorage.getItem("userid"),
-        this.newDirName,
-        dirpath,
-        parentdirid
-      );
+      let result = await reqCreateChildFolder(this.parentId,this.dirpath,this.newDirName,null);
       if (result.code == "200") {
         this.$message({
           type: "success",
           message: "新建成功",
         });
-        this.updateFileList(this.pagenum, parentdirid);
+        this.updateFileList(this.parentId,this.pageNum,this.dirpath);
       } else {
         this.$message.error("新建失败:文件名重复!");
       }
