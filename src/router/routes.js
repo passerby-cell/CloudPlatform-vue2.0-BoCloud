@@ -5,6 +5,7 @@ import Data from '@/pages/Data'
 import Images from '@/pages/Images'
 import Register from '@/pages/Register'
 import StandardJob from '@/pages/StandardJob'
+import ResultData from '@/pages/ResultData'
 export default [
   // ?:用于指定params参数可传可不传,没有问号时,不传params参数时路径会出现丢失的情况
   {
@@ -55,6 +56,15 @@ export default [
     name: 'data',
     path: '/data',
     component: Data,
+    meta: {
+      show: true,
+      requireAuth: true // 配置此条，进入页面前判断是否需要登陆 
+    }
+  },
+  {
+    name: 'resultdata',
+    path: '/resultdata',
+    component: ResultData,
     meta: {
       show: true,
       requireAuth: true // 配置此条，进入页面前判断是否需要登陆 

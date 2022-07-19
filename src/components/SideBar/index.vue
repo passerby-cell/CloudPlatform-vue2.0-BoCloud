@@ -24,7 +24,7 @@
           <el-menu-item @click="toData">
             <span slot="title">数据集</span>
           </el-menu-item>
-          <el-menu-item @click="toData">
+          <el-menu-item @click="toResultData">
             <span slot="title">结果集</span>
           </el-menu-item>
         </el-submenu>
@@ -71,6 +71,9 @@ export default {
     },
     toData() {
       this.$router.push({ name: 'data' })
+    },
+    toResultData() {
+      this.$router.push({ name: 'resultdata' })
     },
     toImages() {
       this.$router.push({ name: 'images' })
