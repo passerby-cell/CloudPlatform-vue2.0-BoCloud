@@ -55,7 +55,7 @@
           >
             <el-row>
               <el-table
-              highlight-current-row
+                highlight-current-row
                 :show-header="false"
                 style="width: 100%"
                 max-height="600px"
@@ -71,7 +71,14 @@
                 >
                   <template slot-scope="scope">
                     <span
-                      @click="updateChileFileList(scope.row.id, pageNum, null,scope.row.name)"
+                      @click="
+                        updateChileFileList(
+                          scope.row.id,
+                          pageNum,
+                          null,
+                          scope.row.name
+                        )
+                      "
                       class="parentIcon"
                       >{{ scope.row.name }}</span
                     >
@@ -125,11 +132,11 @@
           :body-style="{ padding: '0px' }"
           style="height: 680px; margin-top: 10px; margin-left: 10px"
         >
-        <el-row style="margin-top: 10px; margin-left: 10px;font-size:20px">
-           <el-input v-model="dirpath" disabled size="small">
-    <template slot="prepend">当前路径:</template>
-  </el-input>
-        </el-row>
+          <el-row style="margin-top: 10px; margin-left: 10px; font-size: 20px">
+            <el-input v-model="dirpath" disabled size="small">
+              <template slot="prepend">当前路径:</template>
+            </el-input>
+          </el-row>
           <el-row>
             <Transition
               appear
@@ -277,7 +284,7 @@
                       <el-col :span="1">
                         <i
                           class="el-icon-folder"
-                          v-if="(scope.row.fileType == 1)"
+                          v-if="scope.row.fileType == 1"
                         ></i>
                         <i
                           class="el-icon-document"
@@ -352,7 +359,7 @@
                       type="success"
                       icon="el-icon-folder-opened"
                       size="small"
-                      v-if="(scope.row.fileType == 1)"
+                      v-if="scope.row.fileType == 1"
                       @click="openDir(scope.row)"
                       >打开</el-button
                     >
@@ -361,7 +368,7 @@
                       type="danger"
                       icon="el-icon-delete"
                       size="small"
-                      @click="deleteFile(scope.row)"
+                      @click="deleteFile(scope.row.fileName)"
                       >删除</el-button
                     >
                   </template>
@@ -401,6 +408,7 @@ import {
   reqUpdateParentFileName,
   reqUpdateChildFileName,
   reqCreateChildFolder,
+  reqDeleteChildFile,
 } from "@/api";
 export default {
   name: "Data",
@@ -411,11 +419,8 @@ export default {
       parentId: "",
       //路径
       path: [],
-      idpath: [],
       //选中的文件名
       checkedfile: [],
-      //选中的文件id
-      checkedfileid: [],
       // 新建文件夹的对话框
       fileDialogVisible: false,
       // 上传文件对话框
@@ -426,7 +431,7 @@ export default {
       newDirName: "",
       // 旧文件的名称
       oldname: "",
-      parentFileName:"",
+      parentFileName: "",
       newParentFileName: "",
       newParentFileId: "",
     };
@@ -475,10 +480,10 @@ export default {
     },
   },
   methods: {
-    updateChileFileList(id, pageNum, path,fileName){
+    updateChileFileList(id, pageNum, path, fileName) {
       this.parentId = id;
-      this.parentFileName=fileName;
-      this.updateFileList(id, pageNum, path)
+      this.parentFileName = fileName;
+      this.updateFileList(id, pageNum, path);
     },
     updateParentFileNameDialogVisible(row) {
       this.parentFileNameDialogVisible = true;
@@ -561,39 +566,35 @@ export default {
       );
     },
     async deleteFiles() {
-      let result = await reqDeleteFiles(
-        this.localtoken,
-        this.files,
-        this.ids,
+      let result = await reqDeleteChildFile(
+        this.parentId,
+        this.checkedfile,
         this.dirpath
       );
       if (result.code == "200") {
         this.$message({
           type: "success",
-          message: result.message,
+          message: "删除成功",
         });
       }
-      let parentdirid = this.idpath[this.idpath.length - 1];
-      this.updateFileList(this.pagenum, parentdirid);
+      this.updateFileList(this.parentId, this.pageNum, this.dirpath);
       this.checkedfile = [];
-      this.checkedfileid = [];
     },
-    async deleteFile(row) {
-      let result = await reqDeleteFile(
-        this.localtoken,
-        row.name,
-        row.id,
-        this.dirpath,
-        row.isfile
+    async deleteFile(fileName) {
+      let fileList = [];
+      fileList.push(fileName);
+      let result = await reqDeleteChildFile(
+        this.parentId,
+        fileList,
+        this.dirpath
       );
       if (result.code == "200") {
         this.$message({
           type: "success",
-          message: result.message,
+          message: "删除成功",
         });
       }
-      let parentdirid = this.idpath[this.idpath.length - 1];
-      this.updateFileList(this.pagenum, parentdirid);
+      this.updateFileList(this.parentId, this.pageNum, this.dirpath);
     },
     async uploadFile(files) {
       let dirpath = "";
@@ -634,13 +635,18 @@ export default {
       }
     },
     async newDir() {
-      let result = await reqCreateChildFolder(this.parentId,this.dirpath,this.newDirName,null);
+      let result = await reqCreateChildFolder(
+        this.parentId,
+        this.dirpath,
+        this.newDirName,
+        null
+      );
       if (result.code == "200") {
         this.$message({
           type: "success",
           message: "新建成功",
         });
-        this.updateFileList(this.parentId,this.pageNum,this.dirpath);
+        this.updateFileList(this.parentId, this.pageNum, this.dirpath);
       } else {
         this.$message.error("新建失败:文件名重复!");
       }
@@ -655,52 +661,49 @@ export default {
         .catch((_) => {});
     },
     selectTableAll() {
-      if (this.checkedfile.length >= this.filelist.length) {
-        this.checkedfile = [];
-        this.checkedfileid = [];
-      } else {
-        this.checkedfile = [];
-        this.checkedfileid = [];
-        this.filelist.forEach((item) => {
-          this.checkedfileid.push(item.id);
-          this.checkedfile.push(item.name);
-        });
-      }
+      if (this.childFileList != null) {
+        if (this.checkedfile.length >= this.childFileList.length) {
+          this.checkedfile = [];
+        } else {
+          this.checkedfile = [];
+          this.childFileList.forEach((item) => {
+            this.checkedfile.push(item.fileName);
+          });
+        }
+      }this.checkedfile = [];
     },
     selectFile(selection, row) {
-      if (this.checkedfileid.includes(row.id)) {
-        this.checkedfileid.forEach(function (item, index, arr) {
-          if (item == row.id) {
-            arr.splice(index, 1);
-          }
-        });
+      if (this.checkedfile.includes(row.fileName)) {
         this.checkedfile.forEach(function (item, index, arr) {
-          if (item == row.name) {
+          if (item == row.fileName) {
             arr.splice(index, 1);
           }
         });
       } else {
-        this.checkedfile.push(row.name);
-        this.checkedfileid.push(row.id);
+        this.checkedfile.push(row.fileName);
       }
-      if (this.checkedfileid.length == this.filelist.length) {
+      if (this.childFileList!=null) {
+      if (this.checkedfile.length == this.childFileList.length) {
         this.checkedall = true;
       } else {
+        this.checkedall = false;
+      }
+      }else{
         this.checkedall = false;
       }
     },
     goBack() {
       this.path.pop();
-      this.updateFileList(this.parentId,1,this.dirpath);
+      this.updateFileList(this.parentId, 1, this.dirpath);
     },
     openDir(row) {
       this.path.push(row.fileName);
-      this.updateFileList(this.parentId,1, this.dirpath);
+      this.updateFileList(this.parentId, 1, this.dirpath);
     },
     updateFileList(parentId, val, filePath) {
       if (parentId == null && this.parentFileList.length > 0) {
         parentId = this.parentFileList[0].id;
-        this.ParentFileName=this.parentFileList[0].fileName;
+        this.ParentFileName = this.parentFileList[0].fileName;
       }
       this.$store.dispatch("File/getChildFileList", {
         dataId: parentId,
@@ -755,7 +758,7 @@ export default {
   async mounted() {
     let result = await reqParentFile(1, 0, 0);
     this.$store.dispatch("File/getParentFileList", result.data);
-    this.parentFileName=result.data[0].name
+    this.parentFileName = result.data[0].name;
     if (result.code == "200" && result.data.length > 0) {
       this.$store.dispatch("File/getChildFileList", {
         dataId: result.data[0].id,

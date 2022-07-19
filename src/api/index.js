@@ -102,11 +102,25 @@ export const reqUpdateChildFileName = (dataId, filePath, fileName, newName) =>
     },
   });
 
-  export const reqCreateChildFolder = (dataId, filePath, folderName, desc) =>
+export const reqCreateChildFolder = (dataId, filePath, folderName, desc) =>
   apirequest({
     url: "/paas-web/bocapi/fileBcc/createFolder",
     method: "get",
     params: {
-      dataId, filePath, folderName, desc
+      dataId,
+      filePath,
+      folderName,
+      desc,
+    },
+  });
+
+export const reqDeleteChildFile = (dataId, fileList, filePath) =>
+  apirequest({
+    url: "/paas-web/bocapi/fileBcc/deleteFiles",
+    method: "post",
+    data: {
+      dataId,
+      fileList,
+      filePath,
     },
   });
