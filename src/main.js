@@ -9,7 +9,7 @@ import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 import * as echarts from 'echarts';
 
-
+import 'default-passive-events'
 
 //引入mock模块
 import './mock/mockServer.js'

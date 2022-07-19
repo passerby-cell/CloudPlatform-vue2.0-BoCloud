@@ -77,11 +77,27 @@ export const reqDeleteParentFile = (id) =>
     method: "delete",
   });
 
-  export const reqUpdateParentFileName = (id,name,remark,storageId,type) =>
+export const reqUpdateParentFileName = (id, name, remark, storageId, type) =>
   apirequest({
     url: "/paas-web/bocapi/dataBcc/update",
     method: "put",
     data: {
-      id,name,remark,storageId,type
-    }
+      id,
+      name,
+      remark,
+      storageId,
+      type,
+    },
+  });
+
+export const reqUpdateChildFileName = (dataId, filePath, fileName, newName) =>
+  apirequest({
+    url: "/paas-web/bocapi/fileBcc/rename",
+    method: "get",
+    params: {
+      dataId,
+      filePath,
+      fileName,
+      newName,
+    },
   });

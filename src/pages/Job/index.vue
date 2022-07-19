@@ -16,7 +16,7 @@
       leave-active-class="animate__animated animate__fadeOutRight"
     >
       <el-table
-      :row-style="{ height: 40 + 'px' }"
+        :row-style="{ height: 40 + 'px' }"
         :cell-style="{ padding: 0 + 'px' }"
         style="width: 100%; margin-top: 10px; margin-left: 10px"
         :data="formatedJobList"
@@ -77,6 +77,11 @@
               v-if="scope.row.status == 'No_Running'"
               >未开始</el-tag
             >
+             <el-tag
+              size="small"
+              v-if="scope.row.status == 'Running'"
+              >运行中</el-tag
+            >
           </template>
         </el-table-column>
         <!-- TODO: 对任务的操作 -->
@@ -100,7 +105,7 @@
       >
         <el-pagination
           :background="true"
-          :page-sizes="[10,20,30]"
+          :page-sizes="[10, 20, 30]"
           :page-size="page"
           layout="prev, pager, next,sizes"
           :page-count="Number(totalpage)"
@@ -128,14 +133,16 @@ export default {
     ...mapState("Job", ["joblist", "pagesize", "pagenum", "totalpage"]),
     formatedJobList() {
       let JobList = this.joblist;
+
       for (let i = 0; i < JobList.length; i++) {
+        JobList[i].startTime = formatTime(JobList[i].startTime);
+        JobList[i].endTime = formatTime(JobList[i].endTime);
+        JobList[i].createTime = formatTime(JobList[i].createTime);
         if (formatTime(JobList[i].startTime) == "1970-01-01 08:00:00") {
           JobList[i].startTime = "";
+        }
+        if (formatTime(JobList[i].endTime) == "1970-01-01 08:00:00") {
           JobList[i].endTime = "";
-        } else {
-          JobList[i].startTime = formatTime(JobList[i].startTime);
-          JobList[i].endTime = formatTime(JobList[i].endTime);
-          JobList[i].createTime = formatTime(JobList[i].createTime);
         }
       }
       return JobList;

@@ -24,6 +24,7 @@
             v-model="selected"
             placeholder="请选择仓库"
             style="width: 300px; margin-left: 10px"
+            @change="selectChange"
           >
             <el-option
               v-for="item in options"
@@ -38,7 +39,7 @@
           enter-active-class="animate__animated animate__fadeInLeft"
           leave-active-class="animate__animated animate__fadeOutRight"
         >
-          <div @click="selected = title[0].text">
+          <div @click="changeWareHouse(0)">
             <el-card
               id="publicImageCharts1"
               shadow="hover"
@@ -51,7 +52,7 @@
           enter-active-class="animate__animated animate__fadeInLeft"
           leave-active-class="animate__animated animate__fadeOutRight"
         >
-          <div @click="selected = title[1].text">
+          <div @click="changeWareHouse(1)">
             <el-card
               id="publicImageCharts2"
               shadow="hover"
@@ -64,7 +65,7 @@
           enter-active-class="animate__animated animate__fadeInLeft"
           leave-active-class="animate__animated animate__fadeOutRight"
         >
-          <div @click="selected = title[2].text">
+          <div @click="changeWareHouse(2)">
             <el-card
               id="publicImageCharts3"
               shadow="hover"
@@ -98,7 +99,7 @@
         <div style="width: 100%">
           <el-card
             shadow="hover"
-            style="height: 650px; margin-left: 10px"
+            style="height: 650px; margin-left: 10px; overflow-y: auto"
             :body-style="{ padding: '0px' }"
           >
             <el-row>
@@ -116,7 +117,8 @@
                 </el-breadcrumb>
               </Transition>
             </el-row>
-            <el-row v-if="selected">
+
+            <el-row v-if="selected && isShow == false">
               <el-col :span="4" style="margin: 10px">
                 <el-input size="mini" placeholder="请输入镜像名称"></el-input
               ></el-col>
@@ -126,45 +128,94 @@
                 ></el-col
               >
             </el-row>
+
             <el-row>
-              <el-card
-                style="margin-top: 10px; height: 40px"
-                :body-style="{ padding: '0px' }"
+              <Transition
+                appear
+                enter-active-class="animate__animated animate__fadeIn"
+                leave-active-class="animate__animated animate__fadeOut"
               >
-                <div class="circle" v-if="!isShow" @click="isShow=!isShow">
-                  <i
-                    class="el-icon-arrow-right"
-                    style="margin-top: 4px; margin-left: 4px"
-                  ></i>
-                </div>
-                <div class="circle" v-if="isShow" @click="isShow=!isShow">
-                  <i
-                    class="el-icon-arrow-down"
-                    style="margin-top: 4px; margin-left: 4px"
-                  ></i>
-                </div>
-                <span style="margin-left: 10px">firstImage</span>
-              </el-card>
-              <el-descriptions style="margin-left: 30px" v-if="isShow">
-                <el-descriptions-item label="镜像名称"
-                  >firstImage</el-descriptions-item
+                <el-card
+                  v-if="selected"
+                  style="margin-top: 10px; height: 40px"
+                  :body-style="{ padding: '0px' }"
                 >
-                <el-descriptions-item label="所属仓库"
-                  >default</el-descriptions-item
-                >
-                <el-descriptions-item label="仓库服务IP"
-                  >192.168.0.199</el-descriptions-item
-                >
-              </el-descriptions>
-            </el-row>
-            <el-row style="text-align: center" v-if="selected">
-              <el-pagination
-                background
-                layout="prev, pager, next"
-                :total="1000"
+                  <div class="circle" v-if="!isShow" @click="isShow = !isShow">
+                    <i
+                      class="el-icon-arrow-right"
+                      style="margin-top: 4px; margin-left: 4px"
+                    ></i>
+                  </div>
+                  <div class="circle" v-if="isShow" @click="isShow = !isShow">
+                    <i
+                      class="el-icon-arrow-down"
+                      style="margin-top: 4px; margin-left: 4px"
+                    ></i>
+                  </div>
+                  <span style="margin-left: 10px">firstImage</span>
+                </el-card>
+              </Transition>
+              <Transition
+                appear
+                enter-active-class="animate__animated animate__fadeIn"
+                leave-active-class="animate__animated animate__fadeOut"
               >
-              </el-pagination>
+                <el-row>
+                  <el-descriptions style="margin-left: 30px" v-if="isShow">
+                    <el-descriptions-item label="镜像名称"
+                      >firstImage</el-descriptions-item
+                    >
+                    <el-descriptions-item label="所属仓库"
+                      >default</el-descriptions-item
+                    >
+                    <el-descriptions-item label="仓库服务IP"
+                      >192.168.0.199</el-descriptions-item
+                    >
+                  </el-descriptions>
+                  <el-timeline v-if="isShow" style="margin-left: 30px">
+                    <el-timeline-item
+                      v-for="(activity, index) in activities"
+                      :key="index"
+                      :icon="activity.icon"
+                      :type="activity.type"
+                      :color="activity.color"
+                      :size="activity.size"
+                      :timestamp="activity.timestamp"
+                    >
+                      <el-card
+                        >版本:{{
+                          activity.content
+                        }}&emsp;&emsp;&emsp;大小:10G&emsp;&emsp;&emsp;扫描状态:<el-tag
+                          size="mini"
+                          >未扫描</el-tag
+                        >&emsp;&emsp;&emsp;<span
+                          style="cursor: pointer"
+                          class="download"
+                          >下载</span
+                        ></el-card
+                      >
+                    </el-timeline-item>
+                  </el-timeline></el-row
+                ></Transition
+              >
             </el-row>
+            <Transition
+              appear
+              enter-active-class="animate__animated animate__fadeIn"
+              leave-active-class="animate__animated animate__fadeOut"
+            >
+              <el-row
+                style="text-align: center"
+                v-if="selected && isShow == false"
+              >
+                <el-pagination
+                  background
+                  layout="prev, pager, next"
+                  :total="1000"
+                >
+                </el-pagination>
+              </el-row>
+            </Transition>
             <el-result
               style="margin-top: 150px"
               icon="info"
@@ -184,6 +235,53 @@ export default {
   name: "Images",
   data() {
     return {
+      activities: [
+        {
+          content: "支持使用图标",
+          timestamp: "2018-04-12 20:46",
+          size: "large",
+          type: "primary",
+          icon: "el-icon-more",
+          color: "#0bbd87",
+        },
+        {
+          content: "支持使用图标",
+          timestamp: "2018-04-12 20:46",
+          size: "large",
+          type: "primary",
+          icon: "el-icon-more",
+          color: "#0bbd87",
+        },
+        {
+          content: "支持使用图标",
+          timestamp: "2018-04-12 20:46",
+          size: "large",
+          type: "primary",
+          icon: "el-icon-more",
+          color: "#0bbd87",
+        },
+        {
+          content: "支持使用图标",
+          timestamp: "2018-04-12 20:46",
+          size: "large",
+          type: "primary",
+          icon: "el-icon-more",
+          color: "#0bbd87",
+        },
+        {
+          content: "支持自定义颜色",
+          timestamp: "2018-04-03 20:46",
+        },
+        {
+          content: "支持自定义尺寸",
+          timestamp: "2018-04-03 20:46",
+          size: "large",
+        },
+        {
+          content: "默认样式的节点",
+          timestamp: "2018-04-03 20:46",
+        },
+      ],
       isShow: false,
       Image: [
         [
@@ -237,6 +335,16 @@ export default {
     };
   },
   methods: {
+    selectChange(value) {
+      let index = this.options.findIndex((item, index) => {
+        return item.value == value;
+      });
+      this.changeWareHouse(index);
+    },
+    changeWareHouse(index) {
+      this.selected = this.title[index].text;
+      this.isShow = false;
+    },
     initEcharts(main, index) {
       let option = {
         title: this.title[index],
@@ -293,5 +401,8 @@ export default {
   border-radius: 4em;
   background: #99a3bb;
   cursor: pointer;
+}
+.download:hover {
+  color: blue;
 }
 </style>

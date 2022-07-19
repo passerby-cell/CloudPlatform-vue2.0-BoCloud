@@ -71,7 +71,7 @@
                 >
                   <template slot-scope="scope">
                     <span
-                      @click="updateFileList(scope.row.id, pageNum, null)"
+                      @click="updateChileFileList(scope.row.id, pageNum, null,scope.row.name)"
                       class="parentIcon"
                       >{{ scope.row.name }}</span
                     >
@@ -125,6 +125,11 @@
           :body-style="{ padding: '0px' }"
           style="height: 680px; margin-top: 10px; margin-left: 10px"
         >
+        <el-row style="margin-top: 10px; margin-left: 10px;font-size:20px">
+           <el-input v-model="dirpath" disabled size="small">
+    <template slot="prepend">当前路径:</template>
+  </el-input>
+        </el-row>
           <el-row>
             <Transition
               appear
@@ -228,33 +233,6 @@
                 >
               </span>
             </el-dialog>
-            <!-- <Transition
-              appear
-              enter-active-class="animate__animated animate__fadeInLeft"
-              leave-active-class="animate__animated animate__fadeOutRight"
-            >
-              <a
-                :href="
-                  files == 'http://localhost:10086/data'
-                    ? ''
-                    : 'http://localhost:8080/file/downloadfiles?token=' +
-                      localtoken +
-                      '&name=' +
-                      files +
-                      '&dirpath=' +
-                      dirpath
-                "
-              >
-                <el-button
-                  style="margin-top: 10px; margin-left: 10px"
-                  type="primary"
-                  icon="el-icon-download"
-                  size="small"
-                  >下载文件</el-button
-                >
-              </a></Transition
-            > -->
-            <!-- @click="downloadFiles" -->
             <Transition
               appear
               enter-active-class="animate__animated animate__fadeInLeft"
@@ -421,6 +399,7 @@ import {
   reqCreateParentFile,
   reqDeleteParentFile,
   reqUpdateParentFileName,
+  reqUpdateChildFileName,
 } from "@/api";
 export default {
   name: "Data",
@@ -428,6 +407,7 @@ export default {
     return {
       page: 10,
       isShow: [],
+      parentId: "",
       //路径
       path: [],
       idpath: [],
@@ -445,6 +425,7 @@ export default {
       newDirName: "",
       // 旧文件的名称
       oldname: "",
+      parentFileName:"",
       newParentFileName: "",
       newParentFileId: "",
     };
@@ -493,6 +474,11 @@ export default {
     },
   },
   methods: {
+    updateChileFileList(id, pageNum, path,fileName){
+      this.parentId = id;
+      this.parentFileName=fileName;
+      this.updateFileList(id, pageNum, path)
+    },
     updateParentFileNameDialogVisible(row) {
       this.parentFileNameDialogVisible = true;
       this.newParentFileName = row.name;
@@ -714,18 +700,17 @@ export default {
       }
     },
     goBack() {
-      this.updateFileList(1, this.idpath[this.idpath.length - 2]);
-      this.idpath.pop();
       this.path.pop();
+      this.updateFileList(this.parentId,1,this.dirpath);
     },
     openDir(row) {
-      this.path.push(row.name);
-      this.idpath.push(row.id);
-      this.updateFileList(1, row.id);
+      this.path.push(row.fileName);
+      this.updateFileList(this.parentId,1, this.dirpath);
     },
     updateFileList(parentId, val, filePath) {
       if (parentId == null && this.parentFileList.length > 0) {
         parentId = this.parentFileList[0].id;
+        this.ParentFileName=this.parentFileList[0].fileName;
       }
       this.$store.dispatch("File/getChildFileList", {
         dataId: parentId,
@@ -780,6 +765,7 @@ export default {
   async mounted() {
     let result = await reqParentFile(1, 0, 0);
     this.$store.dispatch("File/getParentFileList", result.data);
+    this.parentFileName=result.data[0].name
     if (result.code == "200" && result.data.length > 0) {
       this.$store.dispatch("File/getChildFileList", {
         dataId: result.data[0].id,
