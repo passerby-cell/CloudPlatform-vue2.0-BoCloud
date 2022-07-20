@@ -178,14 +178,14 @@ export const reqImagelIST = (
     },
   });
 
-export const reqImageVersionlIST = (currPageNum, imageName, pageSize) =>
+export const reqImageVersionlIST = (imageName) =>
   apirequest({
     url: "/paas-web/bocapi/image/v2.3/queryRegImageVersionList",
     method: "post",
     data: {
-      currPageNum,
+      currPageNum:1,
       imageName,
-      pageSize,
+      pageSize:1000,
     },
   });
 

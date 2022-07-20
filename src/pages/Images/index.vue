@@ -8,8 +8,8 @@
       <el-breadcrumb separator="/">
         <el-breadcrumb-item>镜像仓库</el-breadcrumb-item>
         <el-breadcrumb-item>镜像管理</el-breadcrumb-item>
-      </el-breadcrumb></Transition
-    >
+      </el-breadcrumb>
+    </Transition>
     <el-card
       style="height: 670px; background-color: #f0f1f3"
       :body-style="{ padding: '0px' }"
@@ -32,8 +32,9 @@
               :label="item.value"
               :value="item.value"
             >
-            </el-option> </el-select
-        ></Transition>
+            </el-option>
+          </el-select>
+        </Transition>
         <Transition
           appear
           enter-active-class="animate__animated animate__fadeInLeft"
@@ -41,7 +42,7 @@
         >
           <div style="width=100%;height:630px;overflow:auto;">
             <div
-              v-for="(item, index) in Image"
+              v-for="(item, index) in imageCatalogs"
               :key="index"
               @click="changeWareHouse(index)"
             >
@@ -53,14 +54,14 @@
               </el-card>
             </div>
             <el-card
-                shadow="hover"
-                :body-style="{ padding: '0px' }"
-                style="height: 180px; width: 300px; margin-top: 5px"
-              >
-             <el-empty description="暂无更多" :image-size="50"></el-empty>
-    </el-card>
-            </div
-        ></Transition>
+              shadow="hover"
+              :body-style="{ padding: '0px' }"
+              style="height: 180px; width: 300px; margin-top: 5px"
+            >
+              <el-empty description="暂无更多" :image-size="50"></el-empty>
+            </el-card>
+          </div>
+        </Transition>
       </el-col>
       <Transition
         appear
@@ -91,39 +92,39 @@
 
             <el-row v-if="selected && isShow == false">
               <el-col :span="4" style="margin: 10px">
-                <el-input size="mini" placeholder="请输入镜像名称"></el-input
-              ></el-col>
+                <el-input size="mini" placeholder="请输入镜像名称"></el-input>
+              </el-col>
               <el-col :span="4" style="margin-top: 10px">
                 <el-button type="primary" size="mini" class="el-icon-search"
                   >搜索</el-button
-                ></el-col
-              >
+                >
+              </el-col>
             </el-row>
 
-            <el-row>
+            <el-row v-for="(item, index) in imageList" :key="index" v-if="selected">
               <Transition
                 appear
                 enter-active-class="animate__animated animate__fadeIn"
                 leave-active-class="animate__animated animate__fadeOut"
               >
                 <el-card
-                  v-if="selected"
+                  v-if="showImages[index].head"
                   style="margin-top: 10px; height: 40px"
                   :body-style="{ padding: '0px' }"
                 >
-                  <div class="circle" v-if="!isShow" @click="isShow = !isShow">
+                  <div class="circle" v-show="!isShow" @click="changeShowImages(index)">
                     <i
                       class="el-icon-arrow-right"
-                      style="margin-top: 4px; margin-left: 4px"
+                      style="margin-top: 5px; margin-left: 4px"
                     ></i>
                   </div>
-                  <div class="circle" v-if="isShow" @click="isShow = !isShow">
+                  <div class="circle" v-show="isShow" @click="fixShowImages(index)">
                     <i
                       class="el-icon-arrow-down"
                       style="margin-top: 4px; margin-left: 4px"
                     ></i>
                   </div>
-                  <span style="margin-left: 10px">firstImage</span>
+                  <span style="margin-left: 10px">{{item.imageName}}</span>
                 </el-card>
               </Transition>
               <Transition
@@ -132,7 +133,7 @@
                 leave-active-class="animate__animated animate__fadeOut"
               >
                 <el-row>
-                  <el-descriptions style="margin-left: 30px" v-if="isShow">
+                  <el-descriptions style="margin-left: 30px" v-show="showImages[index].body">
                     <el-descriptions-item label="镜像名称"
                       >firstImage</el-descriptions-item
                     >
@@ -143,7 +144,7 @@
                       >192.168.0.199</el-descriptions-item
                     >
                   </el-descriptions>
-                  <el-timeline v-if="isShow" style="margin-left: 30px">
+                  <el-timeline v-show="showImages[index].body" style="margin-left: 30px">
                     <el-timeline-item
                       v-for="(activity, index) in activities"
                       :key="index"
@@ -159,16 +160,17 @@
                         }}&emsp;&emsp;&emsp;大小:10G&emsp;&emsp;&emsp;扫描状态:<el-tag
                           size="mini"
                           >未扫描</el-tag
-                        >&emsp;&emsp;&emsp;<span
+                        >
+                        &emsp;&emsp;&emsp;<span
                           style="cursor: pointer"
                           class="download"
                           >下载</span
                         ></el-card
                       >
                     </el-timeline-item>
-                  </el-timeline></el-row
-                ></Transition
-              >
+                  </el-timeline>
+                </el-row>
+              </Transition>
             </el-row>
             <Transition
               appear
@@ -177,12 +179,12 @@
             >
               <el-row
                 style="text-align: center"
-                v-if="selected && isShow == false"
+               v-if="selected && isShow == false"
               >
                 <el-pagination
                   background
                   layout="prev, pager, next"
-                  :total="1000"
+                  :total="Number(totalCount)"
                 >
                 </el-pagination>
               </el-row>
@@ -195,15 +197,16 @@
               v-if="!selected"
             >
             </el-result>
-          </el-card></div
-      ></Transition>
+          </el-card>
+        </div>
+      </Transition>
     </el-card>
   </div>
 </template>
 
 <script>
 import { mapState } from "vuex";
-import { reqImageOverview } from "@/api";
+import { reqImageOverview, reqImagelIST } from "@/api";
 export default {
   name: "Images",
   data() {
@@ -257,26 +260,59 @@ export default {
       ],
       isShow: false,
       Image: [],
-      title: [
-      ],
-      options: [
-      ],
+      title: [],
+      options: [],
       selected: "",
+      imageCatalogId: 0,
+      showImages:[],
     };
   },
   computed: {
-    ...mapState("Image", ["warehouseId", "warehouseName", "imageCatalogs"]),
+    ...mapState("Image", ["warehouseId", "warehouseName", "imageCatalogs",'imageList','totalCount','currPageNum']),
   },
   methods: {
+    fixShowImages(index){
+       this.isShow=!this.isShow;
+      for(let i=0; i<this.showImages.length; i++){
+          this.showImages[i].head = true
+          this.showImages[i].body = false
+      }
+    },
+    changeShowImages(index){
+      this.isShow=!this.isShow;
+      for(let i=0; i<this.showImages.length; i++){
+        if(i!=index){
+          this.showImages[i].head = false
+        }
+        if(i==index){
+          this.showImages[i].body = true
+        }
+      }
+    },
     selectChange(value) {
       let index = this.options.findIndex((item, index) => {
         return item.value == value;
       });
       this.changeWareHouse(index);
     },
-    changeWareHouse(index) {
+    async changeWareHouse(index) {
       this.selected = this.title[index].text;
       this.isShow = false;
+      let result = await reqImagelIST(
+        1,
+        this.imageCatalogs[index].catalogId,
+        this.imageCatalogs[index].catalogType,
+        null,
+        10,
+        this.warehouseId
+      );
+      if (result.success == true && result.rows != null) {
+        this.showImages=[]
+        this.$store.dispatch("Image/getImageList", {imageList:result.rows,totalCount:result.totalCount,currPageNum:result.currPageNum});
+        for (let i = 0; i < result.rows.length; i++) {
+          this.showImages.push({head:true,body:false})
+        }
+      }
     },
     initEcharts(main, index) {
       let option = {
@@ -286,8 +322,8 @@ export default {
           formatter: "{a} <br/>{b} : {c} ({d}%)",
         },
         legend: {
-          right: "10%",
-          top: "33%",
+          right: "14%",
+          top: "37%",
           orient: "vertical",
         },
         series: [
@@ -323,20 +359,20 @@ export default {
         i < result.data.warehouseInfo[0].imageCatalogs.length;
         i++
       ) {
-        let option={
-          value: '',
-        }
+        let option = {
+          value: "",
+        };
         let image = [
           { value: 0, name: "总数" },
           { value: 0, name: "已扫描" },
           { value: 0, name: "扫描中" },
           { value: 0, name: "未扫描" },
         ];
-        let title= {
+        let title = {
           text: "",
           left: "center",
           top: "15px",
-        }
+        };
         image[0].value =
           result.data.warehouseInfo[0].imageCatalogs[i].catalogOverview.total;
         image[1].value =
@@ -349,10 +385,10 @@ export default {
           result.data.warehouseInfo[0].imageCatalogs[
             i
           ].catalogOverview.notScanned;
-          option.value=result.data.warehouseInfo[0].imageCatalogs[i].envName
-          title.text=result.data.warehouseInfo[0].imageCatalogs[i].envName
+        option.value = result.data.warehouseInfo[0].imageCatalogs[i].envName;
+        title.text = result.data.warehouseInfo[0].imageCatalogs[i].envName;
         this.Image.push(image);
-        this.options.push(option)
+        this.options.push(option);
         this.title.push(title);
       }
     }
@@ -370,9 +406,11 @@ export default {
   margin-top: 10px;
   margin-left: 10px;
 }
+
 .el-card {
   margin: 10px;
 }
+
 .circle {
   display: inline-block;
   width: 20px;
@@ -383,6 +421,7 @@ export default {
   background: #99a3bb;
   cursor: pointer;
 }
+
 .download:hover {
   color: blue;
 }
