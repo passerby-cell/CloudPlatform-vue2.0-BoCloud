@@ -138,8 +138,8 @@ export const reqUploadChildFile = (
   apirequest({
     url: "/paas-web/bocapi/fileBcc/upload",
     method: "post",
-    headers:{
-      'Content-Type':'multipart/form-data'
+    headers: {
+      "Content-Type": "multipart/form-data",
     },
     data: {
       chunkNumber: "1",
@@ -153,6 +153,47 @@ export const reqUploadChildFile = (
       filePath,
       rootPath: "/opt/bcc/storage1/NFS3",
       dataId,
-      file
+      file,
+    },
+  });
+
+export const reqImagelIST = (
+  currPageNum,
+  imageCatalogId,
+  imageCatalogType,
+  imageName,
+  pageSize,
+  warehouseId
+) =>
+  apirequest({
+    url: "/paas-web/bocapi/image/v2.3/queryRegImageList",
+    method: "post",
+    data: {
+      currPageNum,
+      imageCatalogId,
+      imageCatalogType,
+      imageName,
+      pageSize,
+      warehouseId,
+    },
+  });
+
+export const reqImageVersionlIST = (currPageNum, imageName, pageSize) =>
+  apirequest({
+    url: "/paas-web/bocapi/image/v2.3/queryRegImageVersionList",
+    method: "post",
+    data: {
+      currPageNum,
+      imageName,
+      pageSize,
+    },
+  });
+
+  export const reqImageOverview = (envId) =>
+  apirequest({
+    url: "/paas-web/bocapi/warehouse/v2.3/overview",
+    method: "post",
+    data: {
+      envId: envId||1,
     },
   });

@@ -4,6 +4,7 @@ import Vuex from 'vuex'
 import Job from './job'
 import File from './file'
 import User from './user'
+import Image from './image'
 
 Vue.use(Vuex)
 
@@ -13,5 +14,6 @@ export default new Vuex.Store({
     Job,
     File,
     User,
+    Image,
   }
 })

@@ -375,6 +375,7 @@ export default {
     },
   },
   mounted() {
+    this.$store.dispatch("Image/getImageOverview")
     this.$nextTick(() => {
       this.initEcharts(document.getElementById("publicImageCharts1"), 0);
       this.initEcharts(document.getElementById("publicImageCharts2"), 1);
