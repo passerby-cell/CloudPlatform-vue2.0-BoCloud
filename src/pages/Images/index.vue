@@ -34,62 +34,19 @@
             >
             </el-option> </el-select
         ></Transition>
-        <Transition
+        <Transition-group
           appear
           enter-active-class="animate__animated animate__fadeInLeft"
           leave-active-class="animate__animated animate__fadeOutRight"
         >
-          <div @click="changeWareHouse(0)">
+          <div v-for="(item,index) in Image" :key="index" @click="changeWareHouse(index)">
             <el-card
-              id="publicImageCharts1"
+              :id="'publicImageCharts'+index"
               shadow="hover"
               style="height: 180px; width: 300px; margin-top: 5px"
             >
             </el-card></div
-        ></Transition>
-        <Transition
-          appear
-          enter-active-class="animate__animated animate__fadeInLeft"
-          leave-active-class="animate__animated animate__fadeOutRight"
-        >
-          <div @click="changeWareHouse(1)">
-            <el-card
-              id="publicImageCharts2"
-              shadow="hover"
-              style="height: 180px; width: 300px"
-            >
-            </el-card></div
-        ></Transition>
-        <Transition
-          appear
-          enter-active-class="animate__animated animate__fadeInLeft"
-          leave-active-class="animate__animated animate__fadeOutRight"
-        >
-          <div @click="changeWareHouse(2)">
-            <el-card
-              id="publicImageCharts3"
-              shadow="hover"
-              style="height: 180px; width: 300px"
-            >
-            </el-card></div
-        ></Transition>
-        <el-row style="text-align: center">
-          <Transition
-            appear
-            enter-active-class="animate__animated animate__fadeInLeft"
-            leave-active-class="animate__animated animate__fadeOutRight"
-          >
-            <el-pagination
-              small
-              background
-              layout="prev, pager, next"
-              :page-size="3"
-              :total="30"
-              :pager-count="5"
-            >
-            </el-pagination
-          ></Transition>
-        </el-row>
+        ></Transition-group>
       </el-col>
       <Transition
         appear
@@ -231,6 +188,8 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
+import { reqImageOverview } from "@/api";
 export default {
   name: "Images",
   data() {
@@ -283,26 +242,7 @@ export default {
         },
       ],
       isShow: false,
-      Image: [
-        [
-          { value: 140, name: "总数" },
-          { value: 233, name: "已扫描" },
-          { value: 128, name: "扫描中" },
-          { value: 222, name: "未扫描" },
-        ],
-        [
-          { value: 40, name: "总数" },
-          { value: 33, name: "已扫描" },
-          { value: 28, name: "扫描中" },
-          { value: 22, name: "未扫描" },
-        ],
-        [
-          { value: 4, name: "总数" },
-          { value: 3, name: "已扫描" },
-          { value: 2, name: "扫描中" },
-          { value: 2, name: "未扫描" },
-        ],
-      ],
+      Image: [],
       title: [
         {
           text: "公共镜像1",
@@ -333,6 +273,9 @@ export default {
       ],
       selected: "",
     };
+  },
+  computed: {
+    ...mapState("Image", ["warehouseId", "warehouseName", "imageCatalogs"]),
   },
   methods: {
     selectChange(value) {
@@ -374,12 +317,43 @@ export default {
       this.$echarts.init(main).setOption(option);
     },
   },
-  mounted() {
-    this.$store.dispatch("Image/getImageOverview")
+  async mounted() {
+    let result = await reqImageOverview(1);
+    if (result.code == "200") {
+      this.$store.dispatch("Image/getImageOverview", {
+        warehouseId: result.data.warehouseInfo[0].warehouseId,
+        warehouseName: result.data.warehouseInfo[0].warehouseName,
+        imageCatalogs: result.data.warehouseInfo[0].imageCatalogs,
+      });
+    }
+
+    if (result.data.warehouseInfo[0].imageCatalogs != null) {
+      for (
+        let i = 0;
+        i < result.data.warehouseInfo[0].imageCatalogs.length;
+        i++
+      ) {
+        let image = [
+          { value: 0, name: "总数" },
+          { value: 0, name: "已扫描" },
+          { value: 0, name: "扫描中" },
+          { value: 0, name: "未扫描" },
+        ];
+        image[0].value =
+          result.data.warehouseInfo[0].imageCatalogs[i].catalogOverview.total;
+        image[1].value =
+          result.data.warehouseInfo[0].imageCatalogs[i].catalogOverview.scanned;
+        image[2].value =
+          result.data.warehouseInfo[0].imageCatalogs[i].catalogOverview.scanning;
+        image[3].value =
+          result.data.warehouseInfo[0].imageCatalogs[i].catalogOverview.notScanned;
+        this.Image.push(image);
+      }
+    }
     this.$nextTick(() => {
-      this.initEcharts(document.getElementById("publicImageCharts1"), 0);
-      this.initEcharts(document.getElementById("publicImageCharts2"), 1);
-      this.initEcharts(document.getElementById("publicImageCharts3"), 2);
+      for (let i = 0; i < this.Image.length; i++) {
+      this.initEcharts(document.getElementById("publicImageCharts"+i), i);
+      }
     });
   },
 };

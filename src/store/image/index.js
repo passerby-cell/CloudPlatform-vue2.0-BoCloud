@@ -9,14 +9,11 @@ const actions = {
   async getImageOverview({
     commit
   }, 
-    envId
+    {warehouseId,warehouseName,imageCatalogs}
   ) {
-    let result = await reqImageOverview(envId)
-    if (result.code == "200") {
-       commit('WAREHOUSEID', result.data.warehouseInfo[0].warehouseId)
-       commit('WAREHOUSENAME', result.data.warehouseInfo[0].warehouseName)
-       commit('IMAGECATALOGS', result.data.warehouseInfo[0].imageCatalogs)
-    }
+       commit('WAREHOUSEID', warehouseId)
+       commit('WAREHOUSENAME', warehouseName)
+       commit('IMAGECATALOGS', imageCatalogs)
      
   },
 }
