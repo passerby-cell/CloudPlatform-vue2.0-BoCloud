@@ -34,19 +34,25 @@
             >
             </el-option> </el-select
         ></Transition>
-        <Transition-group
+        <Transition
           appear
           enter-active-class="animate__animated animate__fadeInLeft"
           leave-active-class="animate__animated animate__fadeOutRight"
         >
-          <div v-for="(item,index) in Image" :key="index" @click="changeWareHouse(index)">
-            <el-card
-              :id="'publicImageCharts'+index"
-              shadow="hover"
-              style="height: 180px; width: 300px; margin-top: 5px"
+          <div style="width=100%;height:630px;overflow:auto;">
+            <div
+              v-for="(item, index) in Image"
+              :key="index"
+              @click="changeWareHouse(index)"
             >
-            </el-card></div
-        ></Transition-group>
+              <el-card
+                :id="'publicImageCharts' + index"
+                shadow="hover"
+                style="height: 200px; width: 300px; margin-top: 5px"
+              >
+              </el-card>
+            </div></div
+        ></Transition>
       </el-col>
       <Transition
         appear
@@ -344,15 +350,19 @@ export default {
         image[1].value =
           result.data.warehouseInfo[0].imageCatalogs[i].catalogOverview.scanned;
         image[2].value =
-          result.data.warehouseInfo[0].imageCatalogs[i].catalogOverview.scanning;
+          result.data.warehouseInfo[0].imageCatalogs[
+            i
+          ].catalogOverview.scanning;
         image[3].value =
-          result.data.warehouseInfo[0].imageCatalogs[i].catalogOverview.notScanned;
+          result.data.warehouseInfo[0].imageCatalogs[
+            i
+          ].catalogOverview.notScanned;
         this.Image.push(image);
       }
     }
     this.$nextTick(() => {
       for (let i = 0; i < this.Image.length; i++) {
-      this.initEcharts(document.getElementById("publicImageCharts"+i), i);
+        this.initEcharts(document.getElementById("publicImageCharts" + i), i);
       }
     });
   },
