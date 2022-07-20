@@ -11,6 +11,9 @@ const actions = {
     commit("TOTALCOUNT", totalCount);
     commit("CURRPAGENUM", currPageNum);
   },
+  getImageVersionList({ commit }, imageVersionList){
+    commit("IMAGEVERSIONLIST", imageVersionList);
+  },
 };
 //准备mutations,用于操作数据--state
 const mutations = {
@@ -32,6 +35,9 @@ const mutations = {
   CURRPAGENUM(state, currPageNum) {
     state.currPageNum = currPageNum;
   },
+  IMAGEVERSIONLIST(state, imageVersionList) {
+    state.imageVersionList = imageVersionList;
+  },
 };
 //准备state,用于存储数据,要先准备仓库categoryList,才能存储数据
 const state = {
@@ -41,6 +47,7 @@ const state = {
   imageList: [],
   pageSize:10,
   totalCount:'',
+  imageVersionList:[],
 };
 
 //用于简化数据

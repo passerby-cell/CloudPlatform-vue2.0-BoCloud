@@ -21,6 +21,8 @@ request.interceptors.request.use((config) => {
   nprogress.start()
   config.headers['token'] = localStorage.getItem("token");
   config.headers['refreshToken'] = localStorage.getItem("refreshToken");
+  // TODO: modelId
+  config.headers['modelId']=1
   return config
 })
 // 响应拦截器

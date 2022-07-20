@@ -101,7 +101,11 @@
               </el-col>
             </el-row>
 
-            <el-row v-for="(item, index) in imageList" :key="index" v-if="selected">
+            <el-row
+              v-for="(item, index) in imageList"
+              :key="index"
+              v-if="selected"
+            >
               <Transition
                 appear
                 enter-active-class="animate__animated animate__fadeIn"
@@ -112,19 +116,27 @@
                   style="margin-top: 10px; height: 40px"
                   :body-style="{ padding: '0px' }"
                 >
-                  <div class="circle" v-show="!isShow" @click="changeShowImages(index)">
+                  <div
+                    class="circle"
+                    v-show="!isShow"
+                    @click="changeShowImages(index, item.imageName)"
+                  >
                     <i
                       class="el-icon-arrow-right"
                       style="margin-top: 5px; margin-left: 4px"
                     ></i>
                   </div>
-                  <div class="circle" v-show="isShow" @click="fixShowImages(index)">
+                  <div
+                    class="circle"
+                    v-show="isShow"
+                    @click="fixShowImages(index)"
+                  >
                     <i
                       class="el-icon-arrow-down"
                       style="margin-top: 4px; margin-left: 4px"
                     ></i>
                   </div>
-                  <span style="margin-left: 10px">{{item.imageName}}</span>
+                  <span style="margin-left: 10px">{{ item.imageName }}</span>
                 </el-card>
               </Transition>
               <Transition
@@ -133,10 +145,13 @@
                 leave-active-class="animate__animated animate__fadeOut"
               >
                 <el-row>
-                  <el-descriptions style="margin-left: 30px" v-show="showImages[index].body">
-                    <el-descriptions-item label="镜像名称"
-                      >firstImage</el-descriptions-item
-                    >
+                  <el-descriptions
+                    style="margin-left: 30px"
+                    v-show="showImages[index].body"
+                  >
+                    <el-descriptions-item label="镜像名称">{{
+                      item.imageName
+                    }}</el-descriptions-item>
                     <el-descriptions-item label="所属仓库"
                       >default</el-descriptions-item
                     >
@@ -144,7 +159,10 @@
                       >192.168.0.199</el-descriptions-item
                     >
                   </el-descriptions>
-                  <el-timeline v-show="showImages[index].body" style="margin-left: 30px">
+                  <el-timeline
+                    v-show="showImages[index].body"
+                    style="margin-left: 30px"
+                  >
                     <el-timeline-item
                       v-for="(activity, index) in activities"
                       :key="index"
@@ -157,8 +175,7 @@
                       <el-card
                         >版本:{{
                           activity.content
-                        }}&emsp;&emsp;&emsp;大小:10G&emsp;&emsp;&emsp;扫描状态:<el-tag
-                          size="mini"
+                        }}&emsp;&emsp;&emsp;扫描状态:<el-tag size="mini"
                           >未扫描</el-tag
                         >
                         &emsp;&emsp;&emsp;<span
@@ -179,7 +196,7 @@
             >
               <el-row
                 style="text-align: center"
-               v-if="selected && isShow == false"
+                v-if="selected && isShow == false"
               >
                 <el-pagination
                   background
@@ -206,96 +223,90 @@
 
 <script>
 import { mapState } from "vuex";
-import { reqImageOverview, reqImagelIST } from "@/api";
+import { reqImageOverview, reqImagelIST, reqImageVersionlIST } from "@/api";
+import { formatTime } from "@/utils/time";
 export default {
   name: "Images",
   data() {
     return {
-      activities: [
-        {
-          content: "支持使用图标",
-          timestamp: "2018-04-12 20:46",
-          size: "large",
-          type: "primary",
-          icon: "el-icon-more",
-          color: "#0bbd87",
-        },
-        {
-          content: "支持使用图标",
-          timestamp: "2018-04-12 20:46",
-          size: "large",
-          type: "primary",
-          icon: "el-icon-more",
-          color: "#0bbd87",
-        },
-        {
-          content: "支持使用图标",
-          timestamp: "2018-04-12 20:46",
-          size: "large",
-          type: "primary",
-          icon: "el-icon-more",
-          color: "#0bbd87",
-        },
-        {
-          content: "支持使用图标",
-          timestamp: "2018-04-12 20:46",
-          size: "large",
-          type: "primary",
-          icon: "el-icon-more",
-          color: "#0bbd87",
-        },
-        {
-          content: "支持自定义颜色",
-          timestamp: "2018-04-03 20:46",
-        },
-        {
-          content: "支持自定义尺寸",
-          timestamp: "2018-04-03 20:46",
-          size: "large",
-        },
-        {
-          content: "默认样式的节点",
-          timestamp: "2018-04-03 20:46",
-        },
-      ],
+      activities: [],
       isShow: false,
       Image: [],
       title: [],
       options: [],
       selected: "",
       imageCatalogId: 0,
-      showImages:[],
+      showImages: [],
     };
   },
   computed: {
-    ...mapState("Image", ["warehouseId", "warehouseName", "imageCatalogs",'imageList','totalCount','currPageNum']),
+    ...mapState("Image", [
+      "warehouseId",
+      "warehouseName",
+      "imageCatalogs",
+      "imageList",
+      "totalCount",
+      "currPageNum",
+    ]),
   },
   methods: {
-    fixShowImages(index){
-       this.isShow=!this.isShow;
-      for(let i=0; i<this.showImages.length; i++){
-          this.showImages[i].head = true
-          this.showImages[i].body = false
+    fixShowImages(index) {
+      this.isShow = !this.isShow;
+      this.activities = [];
+      for (let i = 0; i < this.showImages.length; i++) {
+        this.showImages[i].head = true;
+        this.showImages[i].body = false;
       }
     },
-    changeShowImages(index){
-      this.isShow=!this.isShow;
-      for(let i=0; i<this.showImages.length; i++){
-        if(i!=index){
-          this.showImages[i].head = false
+    async changeShowImages(index, name) {
+      let result = await reqImageVersionlIST(name);
+      if (result.success == true) {
+        this.$store.dispatch("Image/getImageVersionList", result.rows);
+        for (let i = 0; i < result.rows.length; i++) {
+          let itemheader = {
+            content: "",
+            timestamp: "",
+            size: "large",
+            type: "primary",
+            icon: "el-icon-star-on",
+            color: "#0bbd87",
+          };
+          let itembody = {
+            content: "",
+            timestamp: "",
+            size: "large",
+            type: "primary",
+          };
+          if (i == 0) {
+            itemheader.content =result.rows[i].imageTag;
+            itemheader.timestamp = formatTime(result.rows[i].imageCreatetime);
+            this.activities.push(itemheader);
+          } else {
+            itembody.content =result.rows[i].imageTag;
+            itembody.timestamp = formatTime(result.rows[i].imageCreatetime);
+            this.activities.push(itembody);
+          }
         }
-        if(i==index){
-          this.showImages[i].body = true
+      }
+      this.isShow = !this.isShow;
+      for (let i = 0; i < this.showImages.length; i++) {
+        if (i != index) {
+          this.showImages[i].head = false;
+        }
+        if (i == index) {
+          this.showImages[i].body = true;
         }
       }
     },
     selectChange(value) {
+      this.activities = [];
       let index = this.options.findIndex((item, index) => {
         return item.value == value;
       });
       this.changeWareHouse(index);
     },
     async changeWareHouse(index) {
+      this.activities = [];
       this.selected = this.title[index].text;
       this.isShow = false;
       let result = await reqImagelIST(
@@ -307,10 +318,14 @@ export default {
         this.warehouseId
       );
       if (result.success == true && result.rows != null) {
-        this.showImages=[]
-        this.$store.dispatch("Image/getImageList", {imageList:result.rows,totalCount:result.totalCount,currPageNum:result.currPageNum});
+        this.showImages = [];
+        this.$store.dispatch("Image/getImageList", {
+          imageList: result.rows,
+          totalCount: result.totalCount,
+          currPageNum: result.currPageNum,
+        });
         for (let i = 0; i < result.rows.length; i++) {
-          this.showImages.push({head:true,body:false})
+          this.showImages.push({ head: true, body: false });
         }
       }
     },
