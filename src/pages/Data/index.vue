@@ -732,14 +732,12 @@ export default {
         this.$message.warning("新名称与原名称相同");
       }
     },
-    handleCurrentChange(val) {
-      let parentdirid = this.idpath[this.idpath.length - 1];
-      this.updateFileList(val, parentdirid);
+   handleCurrentChange(val) {
+      this.updateFileList(this.parentId, val, this.dirpath);
     },
     handleSizeChange(val) {
       this.page = val;
-      let parentdirid = this.idpath[this.idpath.length - 1];
-      this.updateFileList(1, parentdirid);
+      this.updateFileList(this.parentId, this.pageNum, this.dirpath);
     },
   },
   async mounted() {

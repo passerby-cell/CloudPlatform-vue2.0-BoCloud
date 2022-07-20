@@ -9,11 +9,10 @@
           </template>
 
           <el-menu-item @click="toJob()">
-            <span slot="title">标准作业</span>
+            <span slot="title">作业列表</span>
           </el-menu-item>
           <el-menu-item @click="goStandardJob()">
             <span slot="title">新建作业</span>
-          </el-menu-item>
           </el-menu-item>
         </el-submenu>
         <el-submenu index="2">

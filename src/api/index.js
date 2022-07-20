@@ -185,7 +185,7 @@ export const reqImageVersionlIST = (imageName) =>
     data: {
       currPageNum:1,
       imageName,
-      pageSize:10,
+      pageSize:1000,
     },
   });
 
