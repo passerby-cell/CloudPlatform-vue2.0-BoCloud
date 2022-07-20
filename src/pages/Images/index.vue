@@ -51,7 +51,15 @@
                 style="height: 200px; width: 300px; margin-top: 5px"
               >
               </el-card>
-            </div></div
+            </div>
+            <el-card
+                shadow="hover"
+                :body-style="{ padding: '0px' }"
+                style="height: 180px; width: 300px; margin-top: 5px"
+              >
+             <el-empty description="暂无更多" :image-size="50"></el-empty>
+    </el-card>
+            </div
         ></Transition>
       </el-col>
       <Transition
@@ -250,32 +258,8 @@ export default {
       isShow: false,
       Image: [],
       title: [
-        {
-          text: "公共镜像1",
-          left: "center",
-          top: "15px",
-        },
-        {
-          text: "公共镜像2",
-          left: "center",
-          top: "15px",
-        },
-        {
-          text: "公共镜像3",
-          left: "center",
-          top: "15px",
-        },
       ],
       options: [
-        {
-          value: "公共镜像1",
-        },
-        {
-          value: "公共镜像2",
-        },
-        {
-          value: "公共镜像3",
-        },
       ],
       selected: "",
     };
@@ -310,7 +294,7 @@ export default {
           {
             name: "详细",
             type: "pie",
-            radius: [10, 70],
+            radius: [10, 50],
             center: ["25%", "60%"],
             roseType: "radius",
             label: {
@@ -339,12 +323,20 @@ export default {
         i < result.data.warehouseInfo[0].imageCatalogs.length;
         i++
       ) {
+        let option={
+          value: '',
+        }
         let image = [
           { value: 0, name: "总数" },
           { value: 0, name: "已扫描" },
           { value: 0, name: "扫描中" },
           { value: 0, name: "未扫描" },
         ];
+        let title= {
+          text: "",
+          left: "center",
+          top: "15px",
+        }
         image[0].value =
           result.data.warehouseInfo[0].imageCatalogs[i].catalogOverview.total;
         image[1].value =
@@ -357,7 +349,11 @@ export default {
           result.data.warehouseInfo[0].imageCatalogs[
             i
           ].catalogOverview.notScanned;
+          option.value=result.data.warehouseInfo[0].imageCatalogs[i].envName
+          title.text=result.data.warehouseInfo[0].imageCatalogs[i].envName
         this.Image.push(image);
+        this.options.push(option)
+        this.title.push(title);
       }
     }
     this.$nextTick(() => {
