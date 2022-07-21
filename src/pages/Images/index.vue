@@ -92,103 +92,112 @@
 
             <el-row v-if="selected && isShow == false">
               <el-col :span="4" style="margin: 10px">
-                <el-input size="mini" placeholder="请输入镜像名称"></el-input>
+                <el-input
+                  size="mini"
+                  placeholder="请输入镜像名称"
+                  v-model="imageName"
+                ></el-input>
               </el-col>
               <el-col :span="4" style="margin-top: 10px">
-                <el-button type="primary" size="mini" class="el-icon-search"
+                <el-button
+                  type="primary"
+                  size="mini"
+                  class="el-icon-search"
+                  @click="searchImageList()"
                   >搜索</el-button
                 >
               </el-col>
             </el-row>
-
-            <el-row
-              v-for="(item, index) in imageList"
-              :key="index"
-              v-if="selected"
-            >
-              <Transition
-                appear
-                enter-active-class="animate__animated animate__fadeIn"
-                leave-active-class="animate__animated animate__fadeOut"
+            <div style="height: 530px; width: 100%; overflow: auto">
+              <el-row
+                v-for="(item, index) in imageList"
+                :key="index"
+                v-if="selected"
               >
-                <el-card
-                  v-if="showImages[index].head"
-                  style="margin-top: 10px; height: 40px"
-                  :body-style="{ padding: '0px' }"
+                <Transition
+                  appear
+                  enter-active-class="animate__animated animate__fadeIn"
+                  leave-active-class="animate__animated animate__fadeOut"
                 >
-                  <div
-                    class="circle"
-                    v-show="!isShow"
-                    @click="changeShowImages(index, item.imageName)"
+                  <el-card
+                    v-if="showImages[index].head"
+                    style="margin-top: 10px; height: 40px"
+                    :body-style="{ padding: '0px' }"
                   >
-                    <i
-                      class="el-icon-arrow-right"
-                      style="margin-top: 5px; margin-left: 4px"
-                    ></i>
-                  </div>
-                  <div
-                    class="circle"
-                    v-show="isShow"
-                    @click="fixShowImages(index)"
-                  >
-                    <i
-                      class="el-icon-arrow-down"
-                      style="margin-top: 4px; margin-left: 4px"
-                    ></i>
-                  </div>
-                  <span style="margin-left: 10px">{{ item.imageName }}</span>
-                </el-card>
-              </Transition>
-              <Transition
-                appear
-                enter-active-class="animate__animated animate__fadeIn"
-                leave-active-class="animate__animated animate__fadeOut"
-              >
-                <el-row>
-                  <el-descriptions
-                    style="margin-left: 30px"
-                    v-show="showImages[index].body"
-                  >
-                    <el-descriptions-item label="镜像名称">{{
-                      item.imageName
-                    }}</el-descriptions-item>
-                    <el-descriptions-item label="所属仓库"
-                      >default</el-descriptions-item
+                    <div
+                      class="circle"
+                      v-show="!isShow"
+                      @click="changeShowImages(index, item.imageName)"
                     >
-                    <el-descriptions-item label="仓库服务IP"
-                      >192.168.0.199</el-descriptions-item
+                      <i
+                        class="el-icon-arrow-right"
+                        style="margin-top: 5px; margin-left: 4px"
+                      ></i>
+                    </div>
+                    <div
+                      class="circle"
+                      v-show="isShow"
+                      @click="fixShowImages(index)"
                     >
-                  </el-descriptions>
-                  <el-timeline
-                    v-show="showImages[index].body"
-                    style="margin-left: 30px"
-                  >
-                    <el-timeline-item
-                      v-for="(activity, index) in activities"
-                      :key="index"
-                      :icon="activity.icon"
-                      :type="activity.type"
-                      :color="activity.color"
-                      :size="activity.size"
-                      :timestamp="activity.timestamp"
+                      <i
+                        class="el-icon-arrow-down"
+                        style="margin-top: 4px; margin-left: 4px"
+                      ></i>
+                    </div>
+                    <span style="margin-left: 10px">{{ item.imageName }}</span>
+                  </el-card>
+                </Transition>
+                <Transition
+                  appear
+                  enter-active-class="animate__animated animate__fadeIn"
+                  leave-active-class="animate__animated animate__fadeOut"
+                >
+                  <el-row>
+                    <el-descriptions
+                      style="margin-left: 30px"
+                      v-show="showImages[index].body"
                     >
-                      <el-card
-                        >版本:{{
-                          activity.content
-                        }}&emsp;&emsp;&emsp;扫描状态:<el-tag size="mini"
-                          >未扫描</el-tag
-                        >
-                        &emsp;&emsp;&emsp;<span
-                          style="cursor: pointer"
-                          class="download"
-                          >下载</span
-                        ></el-card
+                      <el-descriptions-item label="镜像名称">{{
+                        item.imageName
+                      }}</el-descriptions-item>
+                      <el-descriptions-item label="所属仓库"
+                        >default</el-descriptions-item
                       >
-                    </el-timeline-item>
-                  </el-timeline>
-                </el-row>
-              </Transition>
-            </el-row>
+                      <el-descriptions-item label="仓库服务IP"
+                        >192.168.0.199</el-descriptions-item
+                      >
+                    </el-descriptions>
+                    <el-timeline
+                      v-show="showImages[index].body"
+                      style="margin-left: 30px"
+                    >
+                      <el-timeline-item
+                        v-for="(activity, index) in activities"
+                        :key="index"
+                        :icon="activity.icon"
+                        :type="activity.type"
+                        :color="activity.color"
+                        :size="activity.size"
+                        :timestamp="activity.timestamp"
+                      >
+                        <el-card
+                          >版本:{{
+                            activity.content
+                          }}&emsp;&emsp;&emsp;扫描状态:<el-tag size="mini"
+                            >未扫描</el-tag
+                          >
+                          &emsp;&emsp;&emsp;<span
+                            style="cursor: pointer"
+                            class="download"
+                            >下载</span
+                          ></el-card
+                        >
+                      </el-timeline-item>
+                    </el-timeline>
+                  </el-row>
+                </Transition>
+              </el-row>
+            </div>
             <Transition
               appear
               enter-active-class="animate__animated animate__fadeIn"
@@ -237,6 +246,8 @@ export default {
       selected: "",
       imageCatalogId: 0,
       showImages: [],
+      imageName: "",
+      index: 0,
     };
   },
   computed: {
@@ -278,11 +289,11 @@ export default {
             type: "primary",
           };
           if (i == 0) {
-            itemheader.content =result.rows[i].imageTag;
+            itemheader.content = result.rows[i].imageTag;
             itemheader.timestamp = formatTime(result.rows[i].imageCreatetime);
             this.activities.push(itemheader);
           } else {
-            itembody.content =result.rows[i].imageTag;
+            itembody.content = result.rows[i].imageTag;
             itembody.timestamp = formatTime(result.rows[i].imageCreatetime);
             this.activities.push(itembody);
           }
@@ -306,6 +317,7 @@ export default {
       this.changeWareHouse(index);
     },
     async changeWareHouse(index) {
+      this.index = index;
       this.activities = [];
       this.selected = this.title[index].text;
       this.isShow = false;
@@ -314,6 +326,27 @@ export default {
         this.imageCatalogs[index].catalogId,
         this.imageCatalogs[index].catalogType,
         null,
+        10,
+        this.warehouseId
+      );
+      if (result.success == true && result.rows != null) {
+        this.showImages = [];
+        this.$store.dispatch("Image/getImageList", {
+          imageList: result.rows,
+          totalCount: result.totalCount,
+          currPageNum: result.currPageNum,
+        });
+        for (let i = 0; i < result.rows.length; i++) {
+          this.showImages.push({ head: true, body: false });
+        }
+      }
+    },
+    async searchImageList() {
+      let result = await reqImagelIST(
+        1,
+        this.imageCatalogs[this.index].catalogId,
+        this.imageCatalogs[this.index].catalogType,
+        this.imageName,
         10,
         this.warehouseId
       );
@@ -433,9 +466,9 @@ export default {
   margin-top: 10px;
   margin-left: 10px;
   /* border-radius: 4em;
-  background: #99a3bb;
-  cursor: pointer;*/
-} 
+  background: #99a3bb;*/
+  cursor: pointer;
+}
 
 .download:hover {
   color: blue;

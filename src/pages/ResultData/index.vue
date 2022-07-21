@@ -130,10 +130,15 @@
       <el-col :span="21">
         <el-card
           :body-style="{ padding: '0px' }"
-          style="height: 680px; margin-top: 10px; margin-left: 10px;"
+          style="height: 680px; margin-top: 10px; margin-left: 10px"
         >
           <el-row style="margin-top: 10px; margin-left: 10px; font-size: 20px">
-            <el-input v-model="dirpath" disabled size="small" style="width:99%">
+            <el-input
+              v-model="dirpath"
+              disabled
+              size="small"
+              style="width: 99%"
+            >
               <template slot="prepend">当前路径:</template>
             </el-input>
           </el-row>
@@ -742,19 +747,20 @@ export default {
   },
   async mounted() {
     let result = await reqParentFile(2, 0, 0);
-    if (result.data.length>0) {
-    this.$store.dispatch("ResultFile/getParentFileList", result.data);
-    this.parentFileName = result.data[0].name;
-    if (result.code == "200" && result.data.length > 0) {
-      this.$store.dispatch("ResultFile/getChildFileList", {
-        dataId: result.data[0].id,
-        filePath: null,
-        current: 1,
-        size: this.page,
-      });
+    if (result.data.length > 0) {
+      this.$store.dispatch("ResultFile/getParentFileList", result.data);
+      this.parentFileName = result.data[0].name;
+      if (result.code == "200" && result.data.length > 0) {
+        this.$store.dispatch("ResultFile/getChildFileList", {
+          dataId: result.data[0].id,
+          filePath: null,
+          current: 1,
+          size: this.page,
+        });
+      }
+      this.initShow();
+      this.parentId = result.data[0].id;
     }
-    this.initShow();
-    this.parentId = result.data[0].id;}
   },
 };
 </script>
