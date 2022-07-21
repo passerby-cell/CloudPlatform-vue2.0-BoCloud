@@ -130,10 +130,10 @@
       <el-col :span="21">
         <el-card
           :body-style="{ padding: '0px' }"
-          style="height: 680px; margin-top: 10px; margin-left: 10px"
+          style="height: 680px; margin-top: 10px; margin-left: 10px;"
         >
           <el-row style="margin-top: 10px; margin-left: 10px; font-size: 20px">
-            <el-input v-model="dirpath" disabled size="small">
+            <el-input v-model="dirpath" disabled size="small" style="width:99%">
               <template slot="prepend">当前路径:</template>
             </el-input>
           </el-row>
@@ -264,8 +264,8 @@
               <el-table
                 ref="table"
                 :data="childFileList"
-                style="width: 100%; margin-left: 10px"
-                max-height="600px"
+                style="width: 98%; margin-left: 10px"
+                max-height="560px"
                 @select-all="selectTableAll"
                 @select="selectFile"
               >
@@ -581,7 +581,7 @@ export default {
       this.updateFileList(this.parentId, this.pageNum, this.dirpath);
     },
     async uploadFile(files) {
-      if (files.file.size < 2048000) {
+      if (files.file.size < 204800000) {
         const formData = new FormData();
         formData.append("file", files.file);
         let identifier =

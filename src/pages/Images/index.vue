@@ -432,10 +432,10 @@ export default {
   height: 20px;
   margin-top: 10px;
   margin-left: 10px;
-  border-radius: 4em;
+  /* border-radius: 4em;
   background: #99a3bb;
-  cursor: pointer;
-}
+  cursor: pointer;*/
+} 
 
 .download:hover {
   color: blue;

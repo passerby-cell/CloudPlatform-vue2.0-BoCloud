@@ -7,7 +7,7 @@
     >
       <el-breadcrumb separator="/">
         <el-breadcrumb-item>我的作业</el-breadcrumb-item>
-        <el-breadcrumb-item>标准作业</el-breadcrumb-item>
+        <el-breadcrumb-item>作业列表</el-breadcrumb-item>
       </el-breadcrumb></Transition
     >
     <Transition
