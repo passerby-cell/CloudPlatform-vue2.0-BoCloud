@@ -180,17 +180,30 @@
                         :size="activity.size"
                         :timestamp="activity.timestamp"
                       >
-                        <el-card
-                          >版本:{{
-                            activity.content
-                          }}&emsp;&emsp;&emsp;扫描状态:<el-tag size="mini"
-                            >未扫描</el-tag
-                          >
-                          &emsp;&emsp;&emsp;<span
-                            style="cursor: pointer"
-                            class="download"
-                            >下载</span
-                          ></el-card
+                        <el-card :body-style="{ padding: '0px' }">
+                          <el-row>
+                            <el-col :span="20"
+                              ><el-descriptions
+                                style="margin-top: 10px; margin-left: 10px"
+                              >
+                                <el-descriptions-item label="版本号">{{
+                                  activity.content
+                                }}</el-descriptions-item>
+                                <el-descriptions-item label="镜像大小">{{
+                                  activity.fileSize
+                                }}</el-descriptions-item>
+                              </el-descriptions></el-col
+                            >
+                            <el-col :span="4">
+                              <el-button
+                                size="mini"
+                                class="el-icon-download"
+                                type="success"
+                                style="margin-top: 10px"
+                                >下载</el-button
+                              >
+                            </el-col>
+                          </el-row></el-card
                         >
                       </el-timeline-item>
                     </el-timeline>
@@ -234,6 +247,7 @@
 import { mapState } from "vuex";
 import { reqImageOverview, reqImagelIST, reqImageVersionlIST } from "@/api";
 import { formatTime } from "@/utils/time";
+import { formatFileSize } from "@/utils/file";
 export default {
   name: "Images",
   data() {
@@ -276,6 +290,7 @@ export default {
         for (let i = 0; i < result.rows.length; i++) {
           let itemheader = {
             content: "",
+            fileSize: "",
             timestamp: "",
             size: "large",
             type: "primary",
@@ -284,6 +299,7 @@ export default {
           };
           let itembody = {
             content: "",
+            fileSize: "",
             timestamp: "",
             size: "large",
             type: "primary",
@@ -291,10 +307,12 @@ export default {
           if (i == 0) {
             itemheader.content = result.rows[i].imageTag;
             itemheader.timestamp = formatTime(result.rows[i].imageCreatetime);
+            itemheader.fileSize = formatFileSize(result.rows[i].imageSize);
             this.activities.push(itemheader);
           } else {
             itembody.content = result.rows[i].imageTag;
             itembody.timestamp = formatTime(result.rows[i].imageCreatetime);
+            itembody.fileSize = formatFileSize(result.rows[i].imageSize);
             this.activities.push(itembody);
           }
         }
