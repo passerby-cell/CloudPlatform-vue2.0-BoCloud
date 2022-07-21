@@ -18,23 +18,39 @@
             enter-active-class="animate__animated animate__fadeInLeft"
             leave-active-class="animate__animated animate__fadeOutRight"
           >
-            <el-button
-              style="margin-top: 10px; margin-left: 10px"
-              type="primary"
-              icon="el-icon-circle-plus-outline"
-              size="mini"
-              @click="parentFileDialogVisible = true"
-              >新建</el-button
+            <el-row>
+              <el-col :span="12" style="margin-top: 12px">
+                <h3 style="margin-left: 5px">
+                  <span style="color: #409eff">|</span>&nbsp;结果集
+                </h3>
+              </el-col>
+              <el-col :span="12"
+                ><el-button
+                  style="
+                    margin-top: 10px;
+                    margin-left: 15px;
+                    padding-right: 5px;
+                    padding-top: 5px;
+                    padding-bottom: 5px;
+                    padding-left: 3px;
+                  "
+                  type="primary"
+                  icon="el-icon-circle-plus-outline"
+                  size="mini"
+                  @click="parentFileDialogVisible = true"
+                  >新建</el-button
+                ></el-col
+              ></el-row
             >
           </Transition>
           <el-dialog
-            title="新建数据集"
+            title="新建结果集"
             :visible.sync="parentFileDialogVisible"
             width="30%"
             :before-close="handleClose"
           >
             <el-input
-              placeholder="请输入新建的数据集名称"
+              placeholder="请输入新建的结果集名称"
               size="small"
               v-model="newParentFileName"
             ></el-input>
@@ -47,7 +63,7 @@
               >
             </span>
           </el-dialog>
-          <el-divider></el-divider>
+          <!-- <el-divider></el-divider> -->
           <Transition
             appear
             enter-active-class="animate__animated animate__fadeInLeft"
@@ -57,7 +73,7 @@
               <el-table
                 highlight-current-row
                 :show-header="false"
-                style="width: 100%"
+                style="width: 100%; margin-top: 10px"
                 max-height="600px"
                 :row-style="{ height: 0 + 'px' }"
                 :cell-style="{ padding: 0 + 'px' }"
@@ -132,6 +148,18 @@
           :body-style="{ padding: '0px' }"
           style="height: 680px; margin-top: 10px; margin-left: 10px"
         >
+          <el-row style="margin-top: 10px">
+            <el-col :span="4">
+              <h3 style="margin-left: 5px; margin-top: 3px">
+                <span style="color: #409eff">|</span>&nbsp;结果集文件列表
+              </h3>
+            </el-col>
+            <el-col :span="20"
+              ><h3>
+                当前结果集: <el-tag size="small">{{ parentFileName }}</el-tag>
+              </h3></el-col
+            >
+          </el-row>
           <el-row style="margin-top: 10px; margin-left: 10px; font-size: 20px">
             <el-input
               v-model="dirpath"
@@ -196,55 +224,8 @@
               enter-active-class="animate__animated animate__fadeInLeft"
               leave-active-class="animate__animated animate__fadeOutRight"
             >
-              <el-dropdown
-                @command="handleUpload"
-                style="margin-top: 10px; margin-left: 10px"
-              >
-                <el-button type="primary" size="small" icon="el-icon-upload">
-                  上传
-                  <i class="el-icon-arrow-down el-icon--right"></i>
-                </el-button>
-                <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item command="uploadFile"
-                    >上传文件</el-dropdown-item
-                  >
-                  <el-dropdown-item command="uploadFiles"
-                    >上传文件夹</el-dropdown-item
-                  >
-                </el-dropdown-menu>
-              </el-dropdown>
             </Transition>
-            <el-dialog
-              title="上传"
-              :visible.sync="uploadDialogVisible"
-              width="433px"
-              :before-close="handleClose"
-            >
-              <el-upload
-                style="margin-left: 15px"
-                drag
-                action
-                :http-request="uploadFile"
-                multiple
-                :auto-upload="false"
-                ref="upload"
-              >
-                <i class="el-icon-upload"></i>
-                <div class="el-upload__text">
-                  将文件拖到此处，或
-                  <em>点击上传</em>
-                </div>
-                <div class="el-upload__tip" slot="tip"></div>
-              </el-upload>
-              <span slot="footer" class="dialog-footer">
-                <el-button @click="uploadDialogVisible = false" size="small"
-                  >取 消</el-button
-                >
-                <el-button type="primary" size="small" @click="submitUpload"
-                  >上 传</el-button
-                >
-              </span>
-            </el-dialog>
+
             <Transition
               appear
               enter-active-class="animate__animated animate__fadeInLeft"
@@ -270,7 +251,7 @@
                 ref="table"
                 :data="childFileList"
                 style="width: 99%; margin-left: 10px"
-                max-height="560px"
+                max-height="530px"
                 @select-all="selectTableAll"
                 @select="selectFile"
               >
@@ -332,41 +313,19 @@
                   <template slot-scope="scope">
                     <el-button
                       style="margin-left: 10px"
-                      type="primary"
-                      icon="el-icon-view"
-                      size="small"
-                      v-if="scope.row.fileType != 1"
-                      @click="previewFile(scope.row.name)"
-                      >预览</el-button
-                    >
-                    <!-- <a
-                      :href="
-                        'http://localhost:8080/file/downloadfile?token=' +
-                        localtoken +
-                        '&name=' +
-                        scope.row.name +
-                        '&dirpath=' +
-                        dirpath
-                      "
-                    > -->
-                    <!-- <el-button
-                        style="margin-left: 10px"
-                        type="warning"
-                        icon="el-icon-download"
-                        size="small"
-                        v-if="scope.row.fileType != 1"
-                        >下载</el-button
-                      > -->
-                    <!-- </a> -->
-                    <!-- @click="downloadFile(scope.row.name)" -->
-                    <el-button
-                      style="margin-left: 10px"
                       type="success"
                       icon="el-icon-folder-opened"
                       size="small"
                       v-if="scope.row.fileType == 1"
                       @click="openDir(scope.row)"
                       >打开</el-button
+                    >
+                    <el-button
+                      style="margin-left: 10px"
+                      type="warning"
+                      icon="el-icon-download"
+                      size="small"
+                      >下载</el-button
                     >
                     <el-button
                       style="margin-left: 10px"
@@ -470,6 +429,7 @@ export default {
   },
   methods: {
     updateChileFileList(id, pageNum, path, fileName) {
+      this.path = [];
       this.parentId = id;
       this.parentFileName = fileName;
       this.updateFileList(id, pageNum, path);
@@ -711,6 +671,7 @@ export default {
       let result = await reqParentFile(2, 0, 0);
       if (result.code == "200") {
         this.$store.dispatch("ResultFile/getParentFileList", result.data);
+        this.parentFileName = result.data[0].name;
       }
       if (this.parentFileList != null) {
         this.updateFileList(this.parentFileList[0].id, this.pageNum, null);

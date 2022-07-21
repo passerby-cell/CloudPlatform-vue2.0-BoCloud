@@ -18,13 +18,29 @@
             enter-active-class="animate__animated animate__fadeInLeft"
             leave-active-class="animate__animated animate__fadeOutRight"
           >
-            <el-button
-              style="margin-top: 10px; margin-left: 10px"
-              type="primary"
-              icon="el-icon-circle-plus-outline"
-              size="mini"
-              @click="parentFileDialogVisible = true"
-              >新建</el-button
+            <el-row>
+              <el-col :span="12" style="margin-top: 12px">
+                <h3 style="margin-left: 5px">
+                  <span style="color: #409eff">|</span>&nbsp;数据集
+                </h3>
+              </el-col>
+              <el-col :span="12"
+                ><el-button
+                  style="
+                    margin-top: 10px;
+                    margin-left: 15px;
+                    padding-right: 5px;
+                    padding-top: 5px;
+                    padding-bottom: 5px;
+                    padding-left: 3px;
+                  "
+                  type="primary"
+                  icon="el-icon-circle-plus-outline"
+                  size="mini"
+                  @click="parentFileDialogVisible = true"
+                  >新建</el-button
+                ></el-col
+              ></el-row
             >
           </Transition>
           <el-dialog
@@ -47,7 +63,7 @@
               >
             </span>
           </el-dialog>
-          <el-divider></el-divider>
+          <!-- <el-divider></el-divider> -->
           <Transition
             appear
             enter-active-class="animate__animated animate__fadeInLeft"
@@ -57,7 +73,7 @@
               <el-table
                 highlight-current-row
                 :show-header="false"
-                style="width: 100%"
+                style="width: 100%; margin-top: 10px"
                 max-height="600px"
                 :row-style="{ height: 0 + 'px' }"
                 :cell-style="{ padding: 0 + 'px' }"
@@ -130,10 +146,27 @@
       <el-col :span="21">
         <el-card
           :body-style="{ padding: '0px' }"
-          style="height: 680px; margin-top: 10px; margin-left: 10px;"
+          style="height: 680px; margin-top: 10px; margin-left: 10px"
         >
+          <el-row style="margin-top: 10px">
+            <el-col :span="4">
+              <h3 style="margin-left: 5px; margin-top: 3px">
+                <span style="color: #409eff">|</span>&nbsp;数据集文件列表
+              </h3>
+            </el-col>
+            <el-col :span="20"
+              ><h3>
+                当前数据集: <el-tag size="small">{{ parentFileName }}</el-tag>
+              </h3></el-col
+            >
+          </el-row>
           <el-row style="margin-top: 10px; margin-left: 10px; font-size: 20px">
-            <el-input v-model="dirpath" disabled size="small" style="width:99%">
+            <el-input
+              v-model="dirpath"
+              disabled
+              size="small"
+              style="width: 99%"
+            >
               <template slot="prepend">当前路径:</template>
             </el-input>
           </el-row>
@@ -265,7 +298,7 @@
                 ref="table"
                 :data="childFileList"
                 style="width: 98%; margin-left: 10px"
-                max-height="560px"
+                max-height="530px"
                 @select-all="selectTableAll"
                 @select="selectFile"
               >
@@ -415,6 +448,7 @@ export default {
   name: "Data",
   data() {
     return {
+      dataSetName: "",
       page: 10,
       isShow: [],
       parentId: "",
@@ -465,6 +499,7 @@ export default {
   },
   methods: {
     updateChileFileList(id, pageNum, path, fileName) {
+      this.path = [];
       this.parentId = id;
       this.parentFileName = fileName;
       this.updateFileList(id, pageNum, path);
@@ -700,12 +735,14 @@ export default {
         current: val,
         size: this.page,
       });
+
       this.initShow();
     },
     async updateParentFileList() {
       let result = await reqParentFile(1, 0, 0);
       if (result.code == "200") {
         this.$store.dispatch("File/getParentFileList", result.data);
+        this.parentFileName = result.data[0].name;
       }
       if (this.parentFileList != null) {
         this.updateFileList(this.parentFileList[0].id, this.pageNum, null);
@@ -732,7 +769,7 @@ export default {
         this.$message.warning("新名称与原名称相同");
       }
     },
-   handleCurrentChange(val) {
+    handleCurrentChange(val) {
       this.updateFileList(this.parentId, val, this.dirpath);
     },
     handleSizeChange(val) {
@@ -742,19 +779,20 @@ export default {
   },
   async mounted() {
     let result = await reqParentFile(1, 0, 0);
-    if (result.data.length>0) {
-    this.$store.dispatch("File/getParentFileList", result.data);
-    this.parentFileName = result.data[0].name;
-    if (result.code == "200" && result.data.length > 0) {
-      this.$store.dispatch("File/getChildFileList", {
-        dataId: result.data[0].id,
-        filePath: null,
-        current: 1,
-        size: this.page,
-      });
+    if (result.data.length > 0) {
+      this.$store.dispatch("File/getParentFileList", result.data);
+      this.parentFileName = result.data[0].name;
+      if (result.code == "200" && result.data.length > 0) {
+        this.$store.dispatch("File/getChildFileList", {
+          dataId: result.data[0].id,
+          filePath: null,
+          current: 1,
+          size: this.page,
+        });
+      }
+      this.initShow();
+      this.parentId = result.data[0].id;
     }
-    this.initShow();
-    this.parentId = result.data[0].id;}
   },
 };
 </script>
