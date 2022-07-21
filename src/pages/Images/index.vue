@@ -240,6 +240,7 @@
                   background
                   layout="prev, pager, next"
                   :total="Number(totalCount)"
+                  @current-change="handleCurrentChange"
                 >
                 </el-pagination>
               </el-row>
@@ -284,6 +285,27 @@ export default {
     ]),
   },
   methods: {
+    async handleCurrentChange(val) {
+      let result = await reqImagelIST(
+        val,
+        this.imageCatalogs[this.index].catalogId,
+        this.imageCatalogs[this.index].catalogType,
+        null,
+        10,
+        this.warehouseId
+      );
+      if (result.success == true && result.rows != null) {
+        this.showImages = [];
+        this.$store.dispatch("Image/getImageList", {
+          imageList: result.rows,
+          totalCount: result.totalCount,
+          currPageNum: result.currPageNum,
+        });
+        for (let i = 0; i < result.rows.length; i++) {
+          this.showImages.push({ head: true, body: false });
+        }
+      }
+    },
     fixShowImages(index) {
       this.showInfo = false;
       this.isShow = !this.isShow;
