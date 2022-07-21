@@ -41,7 +41,7 @@ request.interceptors.response.use((res) => {
 }, (error) => {
   // 失败的回调函数
   nprogress.done()
-  location.href = 'http://localhost:10086/#/login'
+  //location.href = 'http://localhost:10086/#/login'
   return Promise.reject(new Error('fail'))
 })
 

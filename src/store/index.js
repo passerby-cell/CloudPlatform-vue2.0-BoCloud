@@ -3,6 +3,7 @@ import Vuex from 'vuex'
 //引入各存储模块
 import Job from './job'
 import File from './file'
+import ResultFile from './resultfile'
 import User from './user'
 import Image from './image'
 
@@ -15,5 +16,6 @@ export default new Vuex.Store({
     File,
     User,
     Image,
+    ResultFile,
   }
 })

@@ -7,7 +7,7 @@
     >
       <el-breadcrumb separator="/">
         <el-breadcrumb-item>数据服务</el-breadcrumb-item>
-        <el-breadcrumb-item>数据集</el-breadcrumb-item>
+        <el-breadcrumb-item>结果集</el-breadcrumb-item>
       </el-breadcrumb>
     </Transition>
     <el-row>
@@ -448,7 +448,7 @@ export default {
     },
   },
   computed: {
-    ...mapState("File", [
+    ...mapState("ResultFile", [
       "parentFileList",
       "childFileList",
       "pageNum",
@@ -694,7 +694,7 @@ export default {
         parentId = this.parentFileList[0].id;
         this.ParentFileName = this.parentFileList[0].fileName;
       }
-      this.$store.dispatch("File/getChildFileList", {
+      this.$store.dispatch("ResultFile/getChildFileList", {
         dataId: parentId,
         filePath: filePath,
         current: val,
@@ -705,7 +705,7 @@ export default {
     async updateParentFileList() {
       let result = await reqParentFile(2, 0, 0);
       if (result.code == "200") {
-        this.$store.dispatch("File/getParentFileList", result.data);
+        this.$store.dispatch("ResultFile/getParentFileList", result.data);
       }
       if (this.parentFileList != null) {
         this.updateFileList(this.parentFileList[0].id, this.pageNum, null);
@@ -743,10 +743,10 @@ export default {
   async mounted() {
     let result = await reqParentFile(2, 0, 0);
     if (result.data.length>0) {
-    this.$store.dispatch("File/getParentFileList", result.data);
+    this.$store.dispatch("ResultFile/getParentFileList", result.data);
     this.parentFileName = result.data[0].name;
     if (result.code == "200" && result.data.length > 0) {
-      this.$store.dispatch("File/getChildFileList", {
+      this.$store.dispatch("ResultFile/getChildFileList", {
         dataId: result.data[0].id,
         filePath: null,
         current: 1,
