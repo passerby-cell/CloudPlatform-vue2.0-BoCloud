@@ -109,6 +109,22 @@
               </el-col>
             </el-row>
             <div style="height: 530px; width: 100%; overflow: auto">
+              <el-result
+                style="margin-top: 150px"
+                icon="info"
+                title="信息提示"
+                subTitle="点击左侧镜像仓库查看仓库详细信息"
+                v-if="!selected"
+              >
+              </el-result>
+              <el-result
+                style="margin-top: 150px"
+                icon="info"
+                title="信息提示"
+                subTitle="没有符合要求的镜像"
+                v-if="showInfo"
+              >
+              </el-result>
               <el-row
                 v-for="(item, index) in imageList"
                 :key="index"
@@ -228,14 +244,6 @@
                 </el-pagination>
               </el-row>
             </Transition>
-            <el-result
-              style="margin-top: 150px"
-              icon="info"
-              title="信息提示"
-              subTitle="点击左侧镜像仓库查看仓库详细信息"
-              v-if="!selected"
-            >
-            </el-result>
           </el-card>
         </div>
       </Transition>
@@ -252,6 +260,7 @@ export default {
   name: "Images",
   data() {
     return {
+      showInfo: false,
       activities: [],
       isShow: false,
       Image: [],
@@ -276,6 +285,7 @@ export default {
   },
   methods: {
     fixShowImages(index) {
+      this.showInfo = false;
       this.isShow = !this.isShow;
       this.activities = [];
       for (let i = 0; i < this.showImages.length; i++) {
@@ -284,6 +294,7 @@ export default {
       }
     },
     async changeShowImages(index, name) {
+      this.showInfo = false;
       let result = await reqImageVersionlIST(name);
       if (result.success == true) {
         this.$store.dispatch("Image/getImageVersionList", result.rows);
@@ -328,6 +339,7 @@ export default {
       }
     },
     selectChange(value) {
+      this.showInfo = false;
       this.activities = [];
       let index = this.options.findIndex((item, index) => {
         return item.value == value;
@@ -335,6 +347,7 @@ export default {
       this.changeWareHouse(index);
     },
     async changeWareHouse(index) {
+      this.showInfo = false;
       this.index = index;
       this.activities = [];
       this.selected = this.title[index].text;
@@ -368,7 +381,7 @@ export default {
         10,
         this.warehouseId
       );
-      if (result.success == true && result.rows != null) {
+      if (result.success == true) {
         this.showImages = [];
         this.$store.dispatch("Image/getImageList", {
           imageList: result.rows,
@@ -378,6 +391,12 @@ export default {
         for (let i = 0; i < result.rows.length; i++) {
           this.showImages.push({ head: true, body: false });
         }
+        if (result.rows.length == 0) {
+          this.showInfo = true;
+        } else {
+          this.showInfo = false;
+        }
+        this.imageName = "";
       }
     },
     initEcharts(main, index) {
