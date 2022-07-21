@@ -113,6 +113,26 @@ export const reqCreateChildFolder = (dataId, filePath, folderName, desc) =>
       desc,
     },
   });
+export const reqDownloadChildFile = (fileName, dataId, filePath, fileType) =>
+  apirequest({
+    url: "/paas-web/bocapi/fileBcc/download",
+    method: "get",
+    params: {
+      fileName,
+      dataId,
+      filePath,
+      fileType: 1,
+    },
+  });
+
+export const reqQueryZipChildFileStatus = (filePath) =>
+  apirequest({
+    url: "/paas-web/bocapi/fileBcc/status",
+    method: "get",
+    params: {
+      filePath,
+    },
+  });
 
 export const reqDeleteChildFile = (dataId, fileList, filePath) =>
   apirequest({
@@ -183,17 +203,17 @@ export const reqImageVersionlIST = (imageName) =>
     url: "/paas-web/bocapi/image/v2.3/queryRegImageVersionList",
     method: "post",
     data: {
-      currPageNum:1,
+      currPageNum: 1,
       imageName,
-      pageSize:1000,
+      pageSize: 1000,
     },
   });
 
-  export const reqImageOverview = (envId) =>
+export const reqImageOverview = (envId) =>
   apirequest({
     url: "/paas-web/bocapi/warehouse/v2.3/overview",
     method: "post",
     data: {
-      envId: envId||1,
+      envId: envId || 1,
     },
   });

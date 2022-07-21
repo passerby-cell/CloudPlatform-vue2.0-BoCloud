@@ -225,7 +225,19 @@
               leave-active-class="animate__animated animate__fadeOutRight"
             >
             </Transition>
-
+            <Transition
+              appear
+              enter-active-class="animate__animated animate__fadeInLeft"
+              leave-active-class="animate__animated animate__fadeOutRight"
+            >
+              <el-button
+                style="margin-top: 10px; margin-left: 10px"
+                type="primary"
+                icon="el-icon-download"
+                size="small"
+                >下载选中</el-button
+              ></Transition
+            >
             <Transition
               appear
               enter-active-class="animate__animated animate__fadeInLeft"
@@ -325,6 +337,7 @@
                       type="warning"
                       icon="el-icon-download"
                       size="small"
+                      @click="downloadChildFile(scope.row.fileName)"
                       >下载</el-button
                     >
                     <el-button
@@ -374,6 +387,8 @@ import {
   reqCreateChildFolder,
   reqDeleteChildFile,
   reqUploadChildFile,
+  reqDownloadChildFile,
+  reqQueryZipChildFileStatus,
 } from "@/api";
 export default {
   name: "Data",
@@ -428,6 +443,30 @@ export default {
     },
   },
   methods: {
+    async downloadChildFile(fileName) {
+      let result = await reqDownloadChildFile(
+        fileName,
+        this.parentId,
+        this.dirpath
+      );
+      let urlPath = result.data;
+      let strs = urlPath.split("/");
+      if (result.code == "200") {
+        let result = await reqQueryZipChildFileStatus(urlPath);
+        if (result.data == true) {
+          console.log(strs);
+          window.open("http://202.195.239.146:91/" + strs[3] + "/" + strs[4]);
+        } else {
+          let timer = setInterval(async function () {
+            let result = await reqQueryZipChildFileStatus(urlPath);
+            if (result.data == true) {
+              window.open("http://202.195.239.146:91" + strs[0]);
+              clearInterval(timer);
+            }
+          }, 20000);
+        }
+      }
+    },
     updateChileFileList(id, pageNum, path, fileName) {
       this.path = [];
       this.parentId = id;
@@ -500,14 +539,6 @@ export default {
     },
     previewFile(name) {
       let url = "http://127.0.0.1:8080/preview" + this.dirpath + "/" + name;
-      // let url =
-      //   'http://localhost:8080/file/downloadfile?token=' +
-      //   this.localtoken +
-      //   '&name=' +
-      //   name +
-      //   '&dirpath=' +
-      //   this.dirpath
-      // console.log(url)
       let Base64 = require("js-base64").Base64;
       window.open(
         "http://127.0.0.1:8012/onlinePreview?url=" +
