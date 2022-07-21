@@ -235,6 +235,7 @@
                 type="primary"
                 icon="el-icon-download"
                 size="small"
+                @click="downloadChildFiles"
                 >下载选中</el-button
               ></Transition
             >
@@ -443,6 +444,11 @@ export default {
     },
   },
   methods: {
+    downloadChildFiles() {
+      for (let i = 0; i < this.checkedfile.length; i++) {
+        this.downloadChildFile(this.checkedfile[i]);
+      }
+    },
     async downloadChildFile(fileName) {
       let result = await reqDownloadChildFile(
         fileName,
@@ -454,7 +460,6 @@ export default {
       if (result.code == "200") {
         let result = await reqQueryZipChildFileStatus(urlPath);
         if (result.data == true) {
-          console.log(strs);
           window.open("http://202.195.239.146:91/" + strs[3] + "/" + strs[4]);
         } else {
           let timer = setInterval(async function () {
