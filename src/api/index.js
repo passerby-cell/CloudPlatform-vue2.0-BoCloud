@@ -171,7 +171,7 @@ export const reqUploadChildFile = (
       relativePath,
       totalChunks: "1",
       filePath,
-      rootPath: "/opt/bcc/storage1/NFS3",
+      rootPath: "/opt/bcc/storage1/",
       dataId,
       file,
     },
